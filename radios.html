@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Radio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-medium: #1a1a1a;
+            --bg-light: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent: #404040;
+            --border: #333333;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 40px;
+            max-width: 1400px;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+            transition: grid-template-columns 0.3s ease;
+        }
+
+        .container.sidebar-collapsed {
+            grid-template-columns: 1fr 0px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RADIO PLAYER */
+        .radio-player {
+            background: var(--bg-medium);
+            border-radius: 24px;
+            padding: 60px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* DATETIME DISPLAY */
+        .datetime-display {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            text-align: left;
+            font-size: 11px;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+
+        .datetime-time {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .datetime-date {
+            font-weight: 300;
+        }
+
+        .radio-player::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        }
+
+        .radio-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .radio-title {
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .radio-model {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        /* DISPLAY SCREEN */
+        .display {
+            background: #000;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 40px;
+            border: 2px solid var(--border);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+            height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(255, 255, 255, 0.02) 2px,
+                rgba(255, 255, 255, 0.02) 4px
+            );
+            pointer-events: none;
+        }
+
+        .station-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            white-space: nowrap;
+            position: absolute;
+            left: 0;
+            right: 0;
+            animation: scroll-text-continuous 110s linear infinite;
+        }
+
+        @keyframes scroll-text-continuous {
+            0% { 
+                transform: translateX(100%); 
+            }
+            100% { 
+                transform: translateX(-100%); 
+            }
+        }
+
+        .station-name::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 100%;
+            padding-left: 2em;
+        }
+
+        .station-name.paused {
+            animation-play-state: paused;
+        }
+
+        /* CONTROLS */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 24px;
+        }
+
+        .control-btn.small {
+            width: 48px;
+            height: 48px;
+            font-size: 18px;
+        }
+
+        .control-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .control-btn:not(:disabled):hover {
+            background: var(--accent);
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .control-btn.playing {
+            background: var(--text-primary);
+            color: var(--bg-dark);
+        }
+
+        /* VOLUME CONTROL */
+        .volume-control {
+            margin-top: 40px;
+        }
+
+        .volume-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-light);
+            outline: none;
+            -webkit-appearance: none;
+            position: relative;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.1);
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 320px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            opacity: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-medium);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            z-index: 100;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .fullscreen-toggle {
+            position: absolute;
+            right: 70px;
+            top: 20px;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-medium);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            z-index: 100;
+        }
+
+        .fullscreen-toggle:hover {
+            background: var(--accent);
+            transform: scale(1.05);
+        }
+
+        body.fullscreen {
+            padding: 0;
+        }
+
+        body.fullscreen .container {
+            max-width: 100%;
+            height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body.fullscreen .container:not(.sidebar-collapsed) {
+            grid-template-columns: 1fr auto;
+            display: grid;
+            align-items: stretch;
+        }
+
+        body.fullscreen .container.sidebar-collapsed {
+            grid-template-columns: 1fr;
+            display: flex;
+        }
+
+        body.fullscreen .sidebar.collapsed {
+            display: none;
+        }
+
+        body.fullscreen .radio-player {
+            height: auto;
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* ADD STATION FORM */
+        .add-station {
+            background: var(--bg-medium);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .add-station h3 {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        .file-upload-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .file-upload-label {
+            display: block;
+            width: 100%;
+            padding: 12px 24px;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .file-upload-label:hover {
+            background: var(--bg-light);
+            border-color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        #mp3FileInput {
+            display: none;
+        }
+
+        .current-file {
+            margin-top: 12px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* PROGRESS BAR - Only for local files */
+        .progress-control {
+            margin-top: 24px;
+            display: none;
+        }
+
+        .progress-control.visible {
+            display: block;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .progress-wrapper {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-track {
+            position: absolute;
+            width: 100%;
+            height: 6px;
+            background: var(--bg-light);
+            border-radius: 3px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .progress-filled {
+            position: absolute;
+            height: 6px;
+            background: var(--text-primary);
+            border-radius: 3px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: width 0.1s linear;
+            pointer-events: none;
+        }
+
+        .progress-slider {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            background: transparent;
+            outline: none;
+            -webkit-appearance: none;
+            z-index: 2;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .progress-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            background: transparent;
+            border-radius: 3px;
+        }
+
+        .progress-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            cursor: pointer;
+            margin-top: -5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .progress-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-slider::-moz-range-track {
+            width: 100%;
+            height: 6px;
+            background: transparent;
+            border-radius: 3px;
+        }
+
+        .progress-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .progress-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.1);
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--text-primary);
+            background: var(--bg-light);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 24px;
+            background: var(--text-primary);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--text-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* STATIONS LIST */
+        .stations-list {
+            background: var(--bg-medium);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .stations-list.collapsed {
+            padding: 16px 24px;
+            cursor: pointer;
+        }
+
+        .stations-list.collapsed:hover {
+            background: var(--bg-light);
+        }
+
+        .stations-list h3 {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .stations-list.collapsed h3 {
+            margin-bottom: 0;
+        }
+
+        .stations-content {
+            max-height: 2000px;
+            overflow: visible;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            opacity: 1;
+        }
+
+        .stations-list.collapsed .stations-content {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        #stationsList {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .collapse-icon {
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .stations-list.collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+
+        /* MP3 PLAYLIST */
+        .mp3-playlist {
+            background: var(--bg-medium);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .mp3-playlist h3 {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        .mp3-item {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mp3-item:hover {
+            background: var(--bg-light);
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .mp3-item.active {
+            background: var(--text-primary);
+            color: var(--bg-dark);
+            border-color: var(--text-primary);
+        }
+
+        .mp3-item-number {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 24px;
+        }
+
+        .mp3-item.active .mp3-item-number {
+            color: var(--bg-dark);
+        }
+
+        .mp3-item-name {
+            font-size: 13px;
+            font-weight: 500;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mp3-item-duration {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-left: auto;
+        }
+
+        .mp3-item.active .mp3-item-duration {
+            color: var(--bg-dark);
+        }
+
+        .clear-playlist-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-dark);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+
+        .clear-playlist-btn:hover {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        /* SCROLLBAR for MP3 playlist */
+        .mp3-playlist::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .mp3-playlist::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 4px;
+        }
+
+        .mp3-playlist::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        .mp3-playlist::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        .stations-list h3 {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        .station-item {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 70px;
+        }
+
+        .station-item:hover {
+            background: var(--bg-light);
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .station-item.active {
+            background: var(--text-primary);
+            color: var(--bg-dark);
+            border-color: var(--text-primary);
+        }
+
+        .station-item-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            padding-right: 30px;
+        }
+
+        .station-item-url {
+            font-size: 11px;
+            color: var(--text-secondary);
+            opacity: 0.7;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 220px;
+            display: block;
+        }
+
+        .station-item.active .station-item-url {
+            color: var(--bg-dark);
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .station-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: #ff4444;
+            transform: scale(1.1);
+        }
+
+        /* IMPORT/EXPORT BUTTONS INLINE */
+        .file-controls-inline {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* SCROLLBAR for stations list */
+        #stationsList::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #stationsList::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 4px;
+        }
+
+        #stationsList::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        #stationsList::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        .btn-secondary {
+            padding: 12px 16px;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-light);
+            border-color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 968px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .sidebar-toggle {
+                left: 0;
+                top: -50px;
+            }
+            
+            .radio-player {
+                padding: 40px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .radio-player {
+                padding: 24px;
+            }
+
+            .radio-model {
+                font-size: 24px;
+            }
+
+            .control-btn {
+                width: 56px;
+                height: 56px;
+                font-size: 20px;
+            }
+        }
+
+        /* SCROLLBAR */
+        .stations-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .stations-list::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 4px;
+        }
+
+        .stations-list::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        .stations-list::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- RADIO PLAYER -->
+        <div class="radio-player">
+            <button class="sidebar-toggle" id="sidebarToggle">✕</button>
+            <button class="fullscreen-toggle" id="fullscreenToggle" title="Fullscreen">⛶</button>
+            
+            <div class="datetime-display">
+                <div class="datetime-time" id="timeDisplay">00:00</div>
+                <div class="datetime-date" id="dateDisplay">01/01/2024</div>
+            </div>
+
+            <div class="radio-header">
+                <div class="radio-title">Minimal</div>
+                <div class="radio-model">RETRO RADIO</div>
+            </div>
+
+            <div class="display">
+                <div class="station-name" id="displayText">Select a station</div>
+            </div>
+
+            <div class="controls">
+                <button class="control-btn small" id="prevBtn" title="Previous">⏮</button>
+                <button class="control-btn" id="playBtn" title="Play/Pause">▶</button>
+                <button class="control-btn" id="stopBtn" title="Stop">■</button>
+                <button class="control-btn small" id="nextBtn" title="Next">⏭</button>
+            </div>
+
+            <div class="volume-control">
+                <label class="volume-label">Volume</label>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="30">
+            </div>
+
+            <div class="progress-control" id="progressControl">
+                <label class="progress-label">Progress</label>
+                <div class="progress-info">
+                    <span id="currentTime">00:00</span>
+                    <span id="totalTime">00:00</span>
+                </div>
+                <div class="progress-wrapper">
+                    <div class="progress-track"></div>
+                    <div class="progress-filled" id="progressFilled"></div>
+                    <input type="range" class="progress-slider" id="progressSlider" min="0" max="100" value="0" step="0.1">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="sidebar" id="sidebar">
+            <!-- ADD STATION -->
+            <div class="add-station">
+                <h3>Add Station</h3>
+                <div class="input-group">
+                    <input type="text" class="input-field" id="stationTitle" placeholder="Station name">
+                </div>
+                <div class="input-group">
+                    <input type="text" class="input-field" id="stationUrl" placeholder="Stream URL">
+                </div>
+                <button class="btn" id="addBtn">Add</button>
+
+                <div class="file-upload-section">
+                    <label for="mp3FileInput" class="file-upload-label">
+                        📁 Add MP3 to Playlist
+                    </label>
+                    <input type="file" id="mp3FileInput" accept="audio/mp3,audio/mpeg,audio/*" multiple>
+                    <div class="current-file" id="currentFile"></div>
+                </div>
+            </div>
+
+            <!-- STATIONS LIST -->
+            <div class="stations-list" id="stationsListContainer">
+                <h3 id="stationsListHeader">
+                    <span>My Stations</span>
+                    <span class="collapse-icon">▼</span>
+                </h3>
+                <div class="stations-content">
+                    <div id="stationsList"></div>
+                    
+                    <!-- IMPORT/EXPORT -->
+                    <div class="file-controls-inline">
+                        <button class="btn-secondary" id="exportBtn">Export CSV</button>
+                        <button class="btn-secondary" id="importBtn">Import CSV</button>
+                        <input type="file" id="fileInput" accept=".csv">
+                    </div>
+                </div>
+            </div>
+
+            <!-- MP3 PLAYLIST -->
+            <div class="mp3-playlist" id="mp3Playlist" style="display: none;">
+                <h3>MP3 Playlist</h3>
+                <div id="mp3List"></div>
+                <button class="clear-playlist-btn" id="clearPlaylistBtn">Clear Playlist</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class RadioPlayer {
+            constructor() {
+                this.audio = new Audio();
+                // Enable support for various audio formats
+                this.audio.preload = 'metadata';
+                
+                this.currentStation = null;
+                this.stations = this.loadStations();
+                this.isPlaying = false;
+                this.sidebarCollapsed = false;
+
+                this.initElements();
+                this.initEventListeners();
+                this.renderStations();
+                this.updateDisplay();
+                this.startClock();
+                
+                // Set initial sidebar state
+                this.sidebarToggle.textContent = '✕';
+            }
+
+            initElements() {
+                this.playBtn = document.getElementById('playBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.volumeSlider = document.getElementById('volumeSlider');
+                this.displayText = document.getElementById('displayText');
+                this.stationTitle = document.getElementById('stationTitle');
+                this.stationUrl = document.getElementById('stationUrl');
+                this.addBtn = document.getElementById('addBtn');
+                this.exportBtn = document.getElementById('exportBtn');
+                this.importBtn = document.getElementById('importBtn');
+                this.fileInput = document.getElementById('fileInput');
+                this.mp3FileInput = document.getElementById('mp3FileInput');
+                this.currentFileDisplay = document.getElementById('currentFile');
+                this.stationsList = document.getElementById('stationsList');
+                this.stationsListContainer = document.getElementById('stationsListContainer');
+                this.stationsListHeader = document.getElementById('stationsListHeader');
+                this.mp3PlaylistContainer = document.getElementById('mp3Playlist');
+                this.mp3List = document.getElementById('mp3List');
+                this.clearPlaylistBtn = document.getElementById('clearPlaylistBtn');
+                this.sidebarToggle = document.getElementById('sidebarToggle');
+                this.fullscreenToggle = document.getElementById('fullscreenToggle');
+                this.sidebar = document.getElementById('sidebar');
+                this.container = document.querySelector('.container');
+                this.timeDisplay = document.getElementById('timeDisplay');
+                this.dateDisplay = document.getElementById('dateDisplay');
+                
+                // Progress bar elements
+                this.progressControl = document.getElementById('progressControl');
+                this.progressSlider = document.getElementById('progressSlider');
+                this.progressFilled = document.getElementById('progressFilled');
+                this.currentTimeDisplay = document.getElementById('currentTime');
+                this.totalTimeDisplay = document.getElementById('totalTime');
+
+                this.audio.volume = this.volumeSlider.value / 100;
+                this.isSeeking = false;
+                this.isLocalFile = false;
+                this.currentLocalFile = null;
+                
+                // Playlist management
+                this.mp3Playlist = [];
+                this.currentPlaylistIndex = null;
+            }
+
+            initEventListeners() {
+                this.playBtn.addEventListener('click', () => this.togglePlay());
+                this.stopBtn.addEventListener('click', () => this.stop());
+                this.prevBtn.addEventListener('click', () => this.previousStation());
+                this.nextBtn.addEventListener('click', () => this.nextStation());
+                this.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
+                this.addBtn.addEventListener('click', () => this.addStation());
+                this.exportBtn.addEventListener('click', () => this.exportCSV());
+                this.importBtn.addEventListener('click', () => this.fileInput.click());
+                this.fileInput.addEventListener('change', (e) => this.importCSV(e));
+                this.mp3FileInput.addEventListener('change', (e) => this.loadLocalFile(e));
+                this.clearPlaylistBtn.addEventListener('click', () => this.clearPlaylist());
+                this.stationsListHeader.addEventListener('click', () => this.toggleStationsList());
+                this.sidebarToggle.addEventListener('click', () => this.toggleSidebar());
+                this.fullscreenToggle.addEventListener('click', () => this.toggleFullscreen());
+
+                // Progress bar events
+                this.progressSlider.addEventListener('input', (e) => this.onProgressInput(e));
+                this.progressSlider.addEventListener('change', (e) => this.onProgressChange(e));
+                this.progressSlider.addEventListener('mousedown', () => this.isSeeking = true);
+                this.progressSlider.addEventListener('mouseup', () => this.isSeeking = false);
+
+                // Fullscreen change event
+                document.addEventListener('fullscreenchange', () => this.onFullscreenChange());
+                document.addEventListener('webkitfullscreenchange', () => this.onFullscreenChange());
+                document.addEventListener('mozfullscreenchange', () => this.onFullscreenChange());
+                document.addEventListener('MSFullscreenChange', () => this.onFullscreenChange());
+
+                // Allow adding station with Enter key
+                this.stationUrl.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addStation();
+                });
+
+                // Audio events
+                this.audio.addEventListener('play', () => this.onPlay());
+                this.audio.addEventListener('pause', () => this.onPause());
+                this.audio.addEventListener('error', () => this.onError());
+                this.audio.addEventListener('loadedmetadata', () => this.onLoadedMetadata());
+                this.audio.addEventListener('timeupdate', () => this.onTimeUpdate());
+                this.audio.addEventListener('ended', () => this.onTrackEnded());
+            }
+
+            startClock() {
+                const updateTime = () => {
+                    const now = new Date();
+                    
+                    // Format time as HH:MM
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    this.timeDisplay.textContent = `${hours}:${minutes}`;
+                    
+                    // Format date as DD/MM/YYYY
+                    const day = String(now.getDate()).padStart(2, '0');
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                    const year = now.getFullYear();
+                    this.dateDisplay.textContent = `${day}/${month}/${year}`;
+                };
+                
+                updateTime();
+                setInterval(updateTime, 1000);
+            }
+
+            toggleSidebar() {
+                this.sidebarCollapsed = !this.sidebarCollapsed;
+                
+                if (this.sidebarCollapsed) {
+                    this.sidebar.classList.add('collapsed');
+                    this.container.classList.add('sidebar-collapsed');
+                    this.sidebarToggle.textContent = '☰';
+                } else {
+                    this.sidebar.classList.remove('collapsed');
+                    this.container.classList.remove('sidebar-collapsed');
+                    this.sidebarToggle.textContent = '✕';
+                }
+            }
+
+            toggleStationsList() {
+                this.stationsListContainer.classList.toggle('collapsed');
+            }
+
+            toggleFullscreen() {
+                if (!document.fullscreenElement && 
+                    !document.webkitFullscreenElement && 
+                    !document.mozFullScreenElement && 
+                    !document.msFullscreenElement) {
+                    // Enter fullscreen
+                    const elem = document.documentElement;
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen();
+                    } else if (elem.webkitRequestFullscreen) {
+                        elem.webkitRequestFullscreen();
+                    } else if (elem.mozRequestFullScreen) {
+                        elem.mozRequestFullScreen();
+                    } else if (elem.msRequestFullscreen) {
+                        elem.msRequestFullscreen();
+                    }
+                    
+                    // Auto-collapse sidebar when entering fullscreen
+                    if (!this.sidebarCollapsed) {
+                        this.toggleSidebar();
+                    }
+                } else {
+                    // Exit fullscreen
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            }
+
+            onFullscreenChange() {
+                if (document.fullscreenElement || 
+                    document.webkitFullscreenElement || 
+                    document.mozFullScreenElement || 
+                    document.msFullscreenElement) {
+                    // Entered fullscreen
+                    document.body.classList.add('fullscreen');
+                    this.fullscreenToggle.textContent = '⛶';
+                    this.fullscreenToggle.title = 'Exit Fullscreen';
+                } else {
+                    // Exited fullscreen
+                    document.body.classList.remove('fullscreen');
+                    this.fullscreenToggle.textContent = '⛶';
+                    this.fullscreenToggle.title = 'Fullscreen';
+                }
+            }
+
+            previousStation() {
+                // If in playlist mode
+                if (this.isLocalFile && this.currentPlaylistIndex !== null) {
+                    const prevIndex = this.currentPlaylistIndex - 1;
+                    if (prevIndex >= 0) {
+                        this.playFromPlaylist(prevIndex);
+                    }
+                    return;
+                }
+                
+                // Radio stations mode
+                if (this.stations.length === 0) return;
+                
+                const newIndex = this.currentStation === null || this.currentStation === 0 
+                    ? this.stations.length - 1 
+                    : this.currentStation - 1;
+                
+                this.selectStation(newIndex, true);
+            }
+
+            nextStation() {
+                // If in playlist mode
+                if (this.isLocalFile && this.currentPlaylistIndex !== null) {
+                    const nextIndex = this.currentPlaylistIndex + 1;
+                    if (nextIndex < this.mp3Playlist.length) {
+                        this.playFromPlaylist(nextIndex);
+                    }
+                    return;
+                }
+                
+                // Radio stations mode
+                if (this.stations.length === 0) return;
+                
+                const newIndex = this.currentStation === null || this.currentStation === this.stations.length - 1
+                    ? 0
+                    : this.currentStation + 1;
+                
+                this.selectStation(newIndex, true);
+            }
+
+            updateNavigationButtons() {
+                this.prevBtn.disabled = this.stations.length === 0;
+                this.nextBtn.disabled = this.stations.length === 0;
+            }
+
+            loadStations() {
+                const stored = localStorage.getItem('radioStations');
+                return stored ? JSON.parse(stored) : [];
+            }
+
+            saveStations() {
+                localStorage.setItem('radioStations', JSON.stringify(this.stations));
+            }
+
+            addStation() {
+                const title = this.stationTitle.value.trim();
+                const url = this.stationUrl.value.trim();
+
+                if (!title || !url) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                this.stations.push({ title, url });
+                this.saveStations();
+                this.renderStations();
+                this.updateNavigationButtons();
+
+                this.stationTitle.value = '';
+                this.stationUrl.value = '';
+                this.stationTitle.focus();
+            }
+
+            deleteStation(index) {
+                if (confirm(`Delete "${this.stations[index].title}"?`)) {
+                    if (this.currentStation === index) {
+                        this.stop();
+                        this.currentStation = null;
+                    } else if (this.currentStation > index) {
+                        this.currentStation--;
+                    }
+                    this.stations.splice(index, 1);
+                    this.saveStations();
+                    this.renderStations();
+                    this.updateDisplay();
+                    this.updateNavigationButtons();
+                }
+            }
+
+            selectStation(index, autoPlay = false) {
+                const wasPlaying = this.isPlaying;
+                this.stop();
+                
+                // Clear local file mode and playlist
+                this.isLocalFile = false;
+                this.currentLocalFile = null;
+                this.currentPlaylistIndex = null;
+                this.currentFileDisplay.textContent = '';
+                this.progressControl.classList.remove('visible');
+                
+                // Expand stations list when playing radio
+                this.stationsListContainer.classList.remove('collapsed');
+                
+                this.currentStation = index;
+                this.audio.src = this.stations[index].url;
+                this.updateDisplay();
+                this.renderStations();
+                this.renderPlaylist();
+
+                if (wasPlaying || autoPlay) {
+                    this.play();
+                }
+            }
+
+            togglePlay() {
+                if (!this.currentStation && this.currentStation !== 0) {
+                    if (this.stations.length > 0) {
+                        this.selectStation(0, true);
+                    } else {
+                        alert('Add a station first');
+                    }
+                    return;
+                }
+
+                if (this.isPlaying) {
+                    this.pause();
+                } else {
+                    this.play();
+                }
+            }
+
+            play() {
+                this.audio.play().catch(err => {
+                    console.error('Playback error:', err);
+                    alert('Error playing stream');
+                });
+            }
+
+            pause() {
+                this.audio.pause();
+            }
+
+            stop() {
+                this.audio.pause();
+                this.audio.currentTime = 0;
+                this.isPlaying = false;
+                this.playBtn.innerHTML = '▶';
+                this.playBtn.classList.remove('playing');
+                this.displayText.classList.add('paused');
+            }
+
+            setVolume(value) {
+                this.audio.volume = value / 100;
+            }
+
+            formatTime(seconds) {
+                if (!isFinite(seconds)) return '00:00';
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            }
+
+            loadLocalFile(event) {
+                const files = Array.from(event.target.files);
+                if (files.length === 0) return;
+
+                // Add files to playlist
+                files.forEach(file => {
+                    const fileURL = URL.createObjectURL(file);
+                    this.mp3Playlist.push({
+                        name: file.name,
+                        url: fileURL,
+                        file: file
+                    });
+                });
+
+                // Show playlist
+                this.mp3PlaylistContainer.style.display = 'block';
+                this.renderPlaylist();
+
+                // If nothing is playing, start with first new file
+                if (!this.isLocalFile) {
+                    const startIndex = this.mp3Playlist.length - files.length;
+                    this.playFromPlaylist(startIndex);
+                }
+
+                // Clear file input
+                event.target.value = '';
+            }
+
+            renderPlaylist() {
+                this.mp3List.innerHTML = '';
+                
+                if (this.mp3Playlist.length === 0) {
+                    this.mp3PlaylistContainer.style.display = 'none';
+                    return;
+                }
+
+                this.mp3Playlist.forEach((track, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'mp3-item';
+                    if (index === this.currentPlaylistIndex) {
+                        item.classList.add('active');
+                    }
+
+                    item.innerHTML = `
+                        <div class="mp3-item-number">${index + 1}</div>
+                        <div class="mp3-item-name">${track.name}</div>
+                        <button class="delete-btn">×</button>
+                    `;
+
+                    item.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('delete-btn')) {
+                            this.playFromPlaylist(index);
+                        }
+                    });
+
+                    item.querySelector('.delete-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.removeFromPlaylist(index);
+                    });
+
+                    this.mp3List.appendChild(item);
+                });
+            }
+
+            playFromPlaylist(index) {
+                if (index < 0 || index >= this.mp3Playlist.length) return;
+
+                const track = this.mp3Playlist[index];
+                
+                // Stop current playback
+                this.stop();
+                
+                // Set as local file
+                this.isLocalFile = true;
+                this.currentPlaylistIndex = index;
+                this.currentStation = null;
+                
+                // Load the file
+                this.audio.src = track.url;
+                
+                // Update display
+                this.displayText.textContent = track.name;
+                this.displayText.setAttribute('data-text', track.name);
+                this.currentFileDisplay.textContent = `Playing: ${track.name} (${index + 1}/${this.mp3Playlist.length})`;
+                
+                // Collapse stations list when playing MP3
+                this.stationsListContainer.classList.add('collapsed');
+                
+                // Update stations list to show no selection
+                this.renderStations();
+                this.renderPlaylist();
+                
+                // Start playing
+                this.play();
+            }
+
+            removeFromPlaylist(index) {
+                // Revoke object URL to free memory
+                URL.revokeObjectURL(this.mp3Playlist[index].url);
+                
+                // If removing currently playing track
+                if (index === this.currentPlaylistIndex) {
+                    this.stop();
+                    this.isLocalFile = false;
+                    this.currentPlaylistIndex = null;
+                    this.currentFileDisplay.textContent = '';
+                    this.progressControl.classList.remove('visible');
+                }
+                
+                // Adjust current index if needed
+                if (this.currentPlaylistIndex !== null && index < this.currentPlaylistIndex) {
+                    this.currentPlaylistIndex--;
+                }
+                
+                // Remove from playlist
+                this.mp3Playlist.splice(index, 1);
+                
+                // Re-render
+                this.renderPlaylist();
+                
+                if (this.mp3Playlist.length === 0) {
+                    this.mp3PlaylistContainer.style.display = 'none';
+                }
+            }
+
+            clearPlaylist() {
+                if (this.mp3Playlist.length === 0) return;
+                
+                if (confirm(`Clear all ${this.mp3Playlist.length} files from playlist?`)) {
+                    // Revoke all object URLs
+                    this.mp3Playlist.forEach(track => {
+                        URL.revokeObjectURL(track.url);
+                    });
+                    
+                    // Stop if playing from playlist
+                    if (this.isLocalFile) {
+                        this.stop();
+                        this.isLocalFile = false;
+                        this.currentFileDisplay.textContent = '';
+                        this.progressControl.classList.remove('visible');
+                    }
+                    
+                    // Clear playlist
+                    this.mp3Playlist = [];
+                    this.currentPlaylistIndex = null;
+                    this.mp3PlaylistContainer.style.display = 'none';
+                }
+            }
+
+            onTrackEnded() {
+                // Auto-play next track in playlist
+                if (this.isLocalFile && this.currentPlaylistIndex !== null) {
+                    const nextIndex = this.currentPlaylistIndex + 1;
+                    if (nextIndex < this.mp3Playlist.length) {
+                        this.playFromPlaylist(nextIndex);
+                    } else {
+                        // End of playlist
+                        this.stop();
+                    }
+                }
+            }
+
+            onLoadedMetadata() {
+                if (this.isLocalFile && isFinite(this.audio.duration)) {
+                    this.progressControl.classList.add('visible');
+                    this.updateProgressBar();
+                } else {
+                    this.progressControl.classList.remove('visible');
+                }
+            }
+
+            onTimeUpdate() {
+                if (this.isLocalFile && !this.isSeeking) {
+                    this.updateProgressBar();
+                }
+            }
+
+            updateProgressBar() {
+                if (!this.isLocalFile || !isFinite(this.audio.duration)) return;
+
+                const currentTime = this.audio.currentTime;
+                const duration = this.audio.duration;
+                const percentage = (currentTime / duration) * 100;
+
+                this.currentTimeDisplay.textContent = this.formatTime(currentTime);
+                this.totalTimeDisplay.textContent = this.formatTime(duration);
+                this.progressSlider.value = percentage;
+                this.progressFilled.style.width = `${percentage}%`;
+            }
+
+            onProgressInput(e) {
+                if (!this.isLocalFile || !isFinite(this.audio.duration)) return;
+                
+                const percentage = parseFloat(e.target.value);
+                const time = (percentage / 100) * this.audio.duration;
+                this.currentTimeDisplay.textContent = this.formatTime(time);
+                this.progressFilled.style.width = `${percentage}%`;
+            }
+
+            onProgressChange(e) {
+                if (!this.isLocalFile || !isFinite(this.audio.duration)) return;
+                
+                const percentage = parseFloat(e.target.value);
+                const time = (percentage / 100) * this.audio.duration;
+                this.audio.currentTime = time;
+                this.isSeeking = false;
+            }
+
+            onPlay() {
+                this.isPlaying = true;
+                this.playBtn.innerHTML = '❚❚';
+                this.playBtn.classList.add('playing');
+                this.displayText.classList.remove('paused');
+            }
+
+            onPause() {
+                this.isPlaying = false;
+                this.playBtn.innerHTML = '▶';
+                this.playBtn.classList.remove('playing');
+                this.displayText.classList.add('paused');
+            }
+
+            onError() {
+                const url = this.audio.src;
+                let errorMsg = 'Error loading stream.';
+                
+                if (url.includes('.m3u8')) {
+                    errorMsg = 'HLS streams (.m3u8) may not be supported by your browser. Try using Chrome or Safari.';
+                } else if (url.includes('.aac')) {
+                    errorMsg = 'AAC stream error. The stream may be offline or the URL incorrect.';
+                } else if (url.includes('.pls') || url.includes('.m3u')) {
+                    errorMsg = 'Playlist files (.pls, .m3u) are not supported. Use the direct stream URL instead.';
+                }
+                
+                alert(errorMsg + '\n\nURL: ' + url);
+                this.stop();
+            }
+
+            updateDisplay() {
+                let displayText = '';
+                if (this.currentStation !== null) {
+                    displayText = this.stations[this.currentStation].title;
+                } else if (this.isLocalFile && this.currentPlaylistIndex !== null) {
+                    displayText = this.mp3Playlist[this.currentPlaylistIndex].name;
+                } else {
+                    displayText = 'Select a station';
+                }
+                
+                this.displayText.textContent = displayText;
+                this.displayText.setAttribute('data-text', displayText);
+            }
+
+            renderStations() {
+                this.stationsList.innerHTML = '';
+                
+                if (this.stations.length === 0) {
+                    this.stationsList.innerHTML = '<p style="color: var(--text-secondary); font-size: 12px; text-align: center; padding: 20px;">No saved stations</p>';
+                    return;
+                }
+
+                this.stations.forEach((station, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'station-item';
+                    if (index === this.currentStation) {
+                        item.classList.add('active');
+                    }
+
+                    item.innerHTML = `
+                        <div class="station-item-title">${station.title}</div>
+                        <div class="station-item-url">${station.url}</div>
+                        <button class="delete-btn">×</button>
+                    `;
+
+                    item.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('delete-btn')) {
+                            this.selectStation(index, true);
+                        }
+                    });
+
+                    item.querySelector('.delete-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.deleteStation(index);
+                    });
+
+                    this.stationsList.appendChild(item);
+                });
+            }
+
+            exportCSV() {
+                if (this.stations.length === 0) {
+                    alert('No stations to export');
+                    return;
+                }
+
+                const csv = this.stations.map(s => `${s.title},${s.url}`).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'radio-stations.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            importCSV(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const text = e.target.result;
+                        const lines = text.split('\n').filter(line => line.trim());
+                        const imported = lines.map(line => {
+                            const [title, url] = line.split(',').map(s => s.trim());
+                            return { title, url };
+                        }).filter(s => s.title && s.url);
+
+                        if (imported.length === 0) {
+                            alert('No valid stations found in file');
+                            return;
+                        }
+
+                        if (confirm(`Import ${imported.length} station(s)? This will add to existing stations.`)) {
+                            this.stations = [...this.stations, ...imported];
+                            this.saveStations();
+                            this.renderStations();
+                            this.updateNavigationButtons();
+                        }
+                    } catch (err) {
+                        alert('Error reading CSV file');
+                    }
+                    this.fileInput.value = '';
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Initialize the radio player
+        const radio = new RadioPlayer();
+    </script>
+</body>
+</html>
