@@ -1,0 +1,2695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-medium: #1a1a1a;
+            --bg-light: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent: #404040;
+            --border: #333333;
+            --green: #00ff00;
+            --green-glow: rgba(0, 255, 0, 0.5);
+            --red: #ff4444;
+            --red-glow: rgba(255, 68, 68, 0.5);
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        body.fullscreen {
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* FULLSCREEN BUTTON */
+        .fullscreen-btn {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            width: 48px;
+            height: 48px;
+            background: var(--bg-medium);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .fullscreen-btn:hover {
+            background: var(--green);
+            color: var(--bg-dark);
+            transform: scale(1.1);
+        }
+
+        /* MODAL STYLES */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10000;
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-medium);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 900px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            animation: slideUp 0.4s ease-out;
+            border: 2px solid var(--border);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--red);
+            border-color: var(--red);
+            transform: rotate(90deg);
+        }
+
+        /* HEADER WITH CLOCK */
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-medium);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 2rem;
+        }
+
+        .radio-title-style {
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .radio-model-style {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 1rem;
+        }
+
+        .clock-date-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .clock-display {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: var(--green);
+            text-shadow: 0 0 20px var(--green-glow);
+        }
+
+        .date-display {
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+        }
+
+        /* COMPONENT SELECTOR */
+        .component-selector {
+            background: var(--bg-medium);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .selector-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .selector-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .selector-options {
+                gap: 0.75rem;
+            }
+
+            .selector-checkbox label {
+                font-size: 0.9rem;
+            }
+        }
+
+        .export-import-buttons {
+            display: flex;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .export-btn, .import-btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover, .import-btn:hover {
+            background: var(--bg-light);
+            border-color: var(--green);
+            transform: translateY(-2px);
+        }
+
+        #importFile {
+            display: none;
+        }
+
+        .selector-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .selector-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--green);
+        }
+
+        .selector-checkbox label {
+            cursor: pointer;
+            user-select: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .selector-checkbox:hover label {
+            color: var(--green);
+        }
+
+        /* COMPONENTS GRID */
+        .components-grid {
+            display: grid;
+            gap: 2rem;
+            grid-template-columns: 1fr;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .component-section {
+            background: var(--bg-medium);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            display: none;
+            width: 100%;
+        }
+
+        .component-section.visible {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .component-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .component-title-small {
+            font-size: 11px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .component-title-large {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+        }
+
+        /* COLLAPSIBLE SECTIONS */
+        .collapsible-section {
+            background: var(--bg-dark);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .collapsible-header {
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .collapsible-header:hover {
+            background: var(--bg-light);
+        }
+
+        .collapsible-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .collapsible-icon {
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+            color: var(--text-primary);
+            font-weight: 300;
+        }
+
+        .collapsible-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-content.expanded {
+            max-height: 1000px;
+        }
+
+        .collapsible-inner {
+            padding: 1.5rem;
+        }
+
+        /* CALENDAR STYLES */
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .calendar-nav button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .calendar-nav button:hover {
+            background: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .calendar-month-year {
+            font-size: 1.2rem;
+            font-weight: 600;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .week-start-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .week-start-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--green);
+        }
+
+        .calendars-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .mini-calendar {
+            opacity: 0.5;
+            font-size: 0.85rem;
+        }
+
+        .main-calendar {
+            opacity: 1;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.2rem;
+        }
+
+        .calendar-header {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 0.4rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-light);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+
+        .calendar-day.today {
+            background: var(--green);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--green-glow);
+        }
+
+        .calendar-day.past {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        .calendar-day.has-task {
+            border: 2px solid var(--red);
+            box-shadow: 0 0 10px var(--red-glow);
+        }
+
+        .task-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .task-input {
+            flex: 1;
+            padding: 0.75rem;
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .task-input:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+
+        .task-date {
+            width: 150px;
+        }
+
+        .task-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--green);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .task-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 255, 0, 0.3);
+        }
+
+        .tasks-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .task-item {
+            background: var(--bg-medium);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-text {
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .task-date-display {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .task-delete {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .task-delete:hover {
+            background: var(--red);
+            border-color: var(--red);
+        }
+
+        /* RADIO STYLES */
+        .radio-display {
+            background: #000;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--border);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .station-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--green);
+            text-shadow: 0 0 10px var(--green-glow);
+        }
+
+        .radio-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .control-btn:hover {
+            background: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .control-btn.playing {
+            background: var(--green);
+            color: var(--bg-dark);
+        }
+
+        .volume-control {
+            margin-bottom: 1.5rem;
+        }
+
+        .volume-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-light);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .station-input {
+            padding: 0.75rem;
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            width: 100%;
+            margin-bottom: 0.75rem;
+        }
+
+        .station-input:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+
+        .add-station-btn {
+            padding: 0.75rem;
+            background: var(--green);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .add-station-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .stations-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .station-item {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .station-item:hover {
+            background: var(--bg-light);
+            transform: translateX(4px);
+        }
+
+        .station-item.active {
+            background: var(--green);
+            color: var(--bg-dark);
+            border-color: var(--green);
+        }
+
+        .station-item-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .station-item-url {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .station-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: var(--red);
+        }
+
+        /* PROMPT MANAGER STYLES */
+        .prompt-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .prompt-input:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+
+        textarea.prompt-input {
+            min-height: 400px;
+            resize: vertical;
+        }
+
+        .prompt-form-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .prompt-save-btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: var(--green);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .prompt-cancel-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-medium);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .prompts-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .prompt-card {
+            background: var(--bg-dark);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .prompt-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--green);
+        }
+
+        .prompt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .prompt-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .prompt-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 6px;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            background: var(--accent);
+        }
+
+        .prompt-content {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .add-note-btn {
+            padding: 1rem;
+            background: var(--green);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .add-note-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 255, 0, 0.3);
+        }
+
+        /* PAINT STYLES */
+        .paint-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .paint-control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .paint-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .paint-input {
+            padding: 0.5rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .color-input {
+            height: 40px;
+            cursor: pointer;
+        }
+
+        .paint-canvas-container {
+            background: var(--bg-dark);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .paint-canvas-container.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9998;
+            border-radius: 0;
+            margin: 0;
+        }
+
+        .paint-canvas-container.fullscreen #paintCanvas {
+            height: calc(100vh - 2rem);
+        }
+
+        #paintCanvas {
+            width: 100%;
+            height: 400px;
+            background: white;
+            cursor: crosshair;
+            border-radius: 8px;
+        }
+
+        .paint-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .paint-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.75rem;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .paint-btn:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .paint-btn.active {
+            background: var(--green);
+            color: var(--bg-dark);
+        }
+
+        /* TEXT TOOL STYLES */
+        .text-input-container {
+            display: none;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            gap: 0.5rem;
+        }
+
+        .text-input-container.active {
+            display: flex;
+        }
+
+        #textInput {
+            flex: 1;
+        }
+
+        #addTextBtn {
+            background: var(--green);
+            color: var(--bg-dark);
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1040px) {
+            body {
+                padding: 1rem;
+            }
+
+            header,
+            .component-selector,
+            .components-grid {
+                max-width: 100%;
+            }
+
+            .component-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.75rem;
+            }
+
+            header {
+                padding: 1rem;
+            }
+
+            .radio-model-style {
+                font-size: 24px;
+            }
+
+            .component-selector {
+                padding: 1rem;
+            }
+
+            .component-section {
+                padding: 1rem;
+                border-radius: 16px;
+            }
+
+            .component-title-large {
+                font-size: 20px;
+            }
+
+            .calendars-container {
+                grid-template-columns: 1fr;
+            }
+
+            .mini-calendar {
+                display: none;
+            }
+
+            .clock-date-container {
+                gap: 1rem;
+            }
+
+            .clock-display {
+                font-size: 1.5rem;
+            }
+
+            .date-display {
+                font-size: 1rem;
+            }
+
+            .paint-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .export-import-buttons {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+
+            .paint-actions {
+                flex-direction: column;
+            }
+
+            .paint-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- FULLSCREEN BUTTON -->
+    <button class="fullscreen-btn" id="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
+
+    <!-- NOTE MODAL -->
+    <div class="modal-overlay" id="noteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="noteModalTitle">Add Note</div>
+                <button class="modal-close" id="closeNoteModal">×</button>
+            </div>
+            <input type="text" class="prompt-input" id="promptTitle" placeholder="Note title">
+            <textarea class="prompt-input" id="promptContent" placeholder="Note content"></textarea>
+            <div class="prompt-form-actions">
+                <button class="prompt-save-btn" id="savePromptBtn">Save</button>
+                <button class="prompt-cancel-btn" id="cancelPromptBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- HEADER WITH CLOCK -->
+        <header>
+            <div class="radio-title-style">Minimal</div>
+            <div class="radio-model-style">PRODUCTIVITY HUB</div>
+            <div class="clock-date-container">
+                <div class="date-display" id="dateDisplay">Loading...</div>
+                <div class="clock-display" id="clockDisplay">00:00</div>
+            </div>
+        </header>
+
+        <!-- COMPONENT SELECTOR -->
+        <div class="component-selector">
+            <div class="selector-title">Select Components</div>
+            <div class="selector-options">
+                <div class="selector-checkbox">
+                    <input type="checkbox" id="toggleCalendar" checked>
+                    <label for="toggleCalendar">Calendar</label>
+                </div>
+                <div class="selector-checkbox">
+                    <input type="checkbox" id="toggleRadio" checked>
+                    <label for="toggleRadio">Radio</label>
+                </div>
+                <div class="selector-checkbox">
+                    <input type="checkbox" id="togglePrompts" checked>
+                    <label for="togglePrompts">Notes</label>
+                </div>
+                <div class="selector-checkbox">
+                    <input type="checkbox" id="togglePaint" checked>
+                    <label for="togglePaint">Paint</label>
+                </div>
+                <div class="selector-checkbox">
+                    <input type="checkbox" id="toggleExport" checked>
+                    <label for="toggleExport">Export/Import</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMPONENTS GRID -->
+        <div class="components-grid">
+            <!-- EXPORT/IMPORT SECTION -->
+            <div class="component-section visible" id="exportSection">
+                <div class="export-import-buttons" style="margin: 0;">
+                    <button class="export-btn" id="exportAllBtn">↓ Export All Data (CSV)</button>
+                    <button class="import-btn" id="importAllBtn">↑ Import Data (CSV)</button>
+                    <input type="file" id="importFile" accept=".csv">
+                </div>
+            </div>
+
+            <!-- CALENDAR -->
+            <div class="component-section visible" id="calendarSection">
+                <div class="component-title">
+                    <div class="component-title-small">Minimal</div>
+                    <div class="component-title-large">CALENDAR</div>
+                </div>
+                
+                <div class="calendar-controls">
+                    <div class="calendar-nav">
+                        <button id="prevMonth">←</button>
+                        <div class="calendar-month-year" id="currentMonthYear"></div>
+                        <button id="nextMonth">→</button>
+                    </div>
+                </div>
+
+                <div class="calendars-container" id="calendarsContainer"></div>
+
+                <div class="week-start-toggle" style="text-align: center; margin-bottom: 1.5rem;">
+                    <input type="checkbox" id="sundayStart">
+                    <label for="sundayStart" style="font-size: 0.75rem;">Sunday first</label>
+                </div>
+
+                <div class="tasks-list" id="tasksList"></div>
+
+                <!-- Collapsible Add Task Section -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="taskHeader">
+                        <span class="collapsible-title">Add Task</span>
+                        <span class="collapsible-icon">›</span>
+                    </div>
+                    <div class="collapsible-content" id="taskContent">
+                        <div class="collapsible-inner">
+                            <div class="task-input-group">
+                                <input type="text" class="task-input" id="taskInput" placeholder="Task description">
+                                <input type="date" class="task-input task-date" id="taskDate">
+                                <button class="task-btn" id="addTaskBtn">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RADIO -->
+            <div class="component-section visible" id="radioSection">
+                <div class="component-title">
+                    <div class="component-title-small">Minimal</div>
+                    <div class="component-title-large">RADIO</div>
+                </div>
+                
+                <div class="radio-display">
+                    <div class="station-name" id="stationName">Select a station</div>
+                </div>
+
+                <div class="radio-controls">
+                    <button class="control-btn" id="playBtn">▶</button>
+                    <button class="control-btn" id="stopBtn">■</button>
+                </div>
+
+                <div class="volume-control">
+                    <label class="volume-label">Volume</label>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="30">
+                </div>
+
+                <!-- Collapsible Stations List -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="stationsListHeader">
+                        <span class="collapsible-title">Stations List</span>
+                        <span class="collapsible-icon expanded">›</span>
+                    </div>
+                    <div class="collapsible-content expanded" id="stationsListContent">
+                        <div class="collapsible-inner">
+                            <div class="stations-list" id="stationsList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Collapsible Add Station Section -->
+                <div class="collapsible-section">
+                    <div class="collapsible-header" id="stationHeader">
+                        <span class="collapsible-title">Add Station</span>
+                        <span class="collapsible-icon">›</span>
+                    </div>
+                    <div class="collapsible-content" id="stationContent">
+                        <div class="collapsible-inner">
+                            <input type="text" class="station-input" id="stationTitle" placeholder="Station name">
+                            <input type="text" class="station-input" id="stationUrl" placeholder="Stream URL">
+                            <button class="add-station-btn" id="addStationBtn">Add Station</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOTES -->
+            <div class="component-section visible" id="promptsSection">
+                <div class="component-title">
+                    <div class="component-title-small">Minimal</div>
+                    <div class="component-title-large">NOTES</div>
+                </div>
+                
+                <button class="add-note-btn" id="addNoteBtn">+ Add New Note</button>
+                
+                <div class="prompts-list" id="promptsList"></div>
+            </div>
+
+            <!-- PAINT -->
+            <div class="component-section visible" id="paintSection">
+                <div class="component-title">
+                    <div class="component-title-small">Minimal</div>
+                    <div class="component-title-large">PAINT</div>
+                </div>
+                
+                <div class="paint-controls">
+                    <div class="paint-control-group">
+                        <label class="paint-label">Color</label>
+                        <input type="color" class="paint-input color-input" id="paintColor" value="#000000">
+                    </div>
+                    <div class="paint-control-group">
+                        <label class="paint-label">Brush Size</label>
+                        <input type="range" class="paint-input" id="brushSize" min="1" max="50" value="3">
+                    </div>
+                    <div class="paint-control-group">
+                        <label class="paint-label">Font Size</label>
+                        <input type="range" class="paint-input" id="fontSize" min="12" max="72" value="24">
+                    </div>
+                </div>
+
+                <div class="paint-canvas-container" id="paintCanvasContainer">
+                    <canvas id="paintCanvas"></canvas>
+                </div>
+
+                <div class="text-input-container" id="textInputContainer">
+                    <input type="text" class="paint-input" id="textInput" placeholder="Enter text to add">
+                    <button class="paint-btn" id="addTextBtn">Add Text</button>
+                </div>
+
+                <div class="paint-actions">
+                    <button class="paint-btn active" id="brushBtn">Brush</button>
+                    <button class="paint-btn" id="eraserBtn">Eraser</button>
+                    <button class="paint-btn" id="textBtn">Text</button>
+                    <button class="paint-btn" id="pasteBtn">Paste Image</button>
+                    <button class="paint-btn" id="fullscreenCanvas">Fullscreen</button>
+                    <button class="paint-btn" id="clearCanvas">Clear</button>
+                    <button class="paint-btn" id="saveCanvas">Save Image</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // UTILITY FUNCTIONS
+        function saveToLocalStorage(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        function loadFromLocalStorage(key, defaultValue) {
+            const stored = localStorage.getItem(key);
+            return stored ? JSON.parse(stored) : defaultValue;
+        }
+
+        // FULLSCREEN MODULE
+        const FullscreenModule = {
+            init() {
+                document.getElementById('fullscreenBtn').addEventListener('click', () => this.toggle());
+                
+                // Listen for fullscreen changes
+                document.addEventListener('fullscreenchange', () => this.updateIcon());
+                document.addEventListener('webkitfullscreenchange', () => this.updateIcon());
+                document.addEventListener('mozfullscreenchange', () => this.updateIcon());
+                document.addEventListener('MSFullscreenChange', () => this.updateIcon());
+            },
+
+            toggle() {
+                if (!document.fullscreenElement && !document.webkitFullscreenElement && 
+                    !document.mozFullScreenElement && !document.msFullscreenElement) {
+                    this.enter();
+                } else {
+                    this.exit();
+                }
+            },
+
+            enter() {
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            },
+
+            exit() {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            },
+
+            updateIcon() {
+                const btn = document.getElementById('fullscreenBtn');
+                const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || 
+                                    document.mozFullScreenElement || document.msFullscreenElement;
+                btn.textContent = isFullscreen ? '⛶' : '⛶';
+            }
+        };
+
+        // COLLAPSIBLE FUNCTIONALITY
+        function initCollapsible(headerId, contentId) {
+            const header = document.getElementById(headerId);
+            const content = document.getElementById(contentId);
+            const icon = header.querySelector('.collapsible-icon');
+            
+            header.addEventListener('click', () => {
+                const isExpanded = content.classList.contains('expanded');
+                
+                if (isExpanded) {
+                    content.classList.remove('expanded');
+                    icon.classList.remove('expanded');
+                } else {
+                    content.classList.add('expanded');
+                    icon.classList.add('expanded');
+                }
+            });
+        }
+
+        // CLOCK MODULE
+        const ClockModule = {
+            init() {
+                this.updateClock();
+                setInterval(() => this.updateClock(), 1000);
+            },
+
+            updateClock() {
+                const now = new Date();
+                
+                // Time (without seconds)
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                document.getElementById('clockDisplay').textContent = `${hours}:${minutes}`;
+                
+                // Date (dd/mm/yy)
+                const day = String(now.getDate()).padStart(2, '0');
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const year = String(now.getFullYear()).slice(-2);
+                document.getElementById('dateDisplay').textContent = `${day}/${month}/${year}`;
+            }
+        };
+
+        // COMPONENT SELECTOR MODULE
+        const ComponentSelector = {
+            init() {
+                const components = ['calendar', 'radio', 'prompts', 'paint', 'export'];
+                
+                components.forEach(comp => {
+                    const checkbox = document.getElementById(`toggle${comp.charAt(0).toUpperCase() + comp.slice(1)}`);
+                    const section = document.getElementById(`${comp}Section`);
+                    
+                    // Load saved state
+                    const isVisible = loadFromLocalStorage(`show_${comp}`, true);
+                    checkbox.checked = isVisible;
+                    section.classList.toggle('visible', isVisible);
+                    
+                    // Listen for changes
+                    checkbox.addEventListener('change', (e) => {
+                        const visible = e.target.checked;
+                        section.classList.toggle('visible', visible);
+                        saveToLocalStorage(`show_${comp}`, visible);
+                    });
+                });
+            }
+        };
+
+        // CALENDAR MODULE
+        const CalendarModule = {
+            currentDate: new Date(),
+            tasks: loadFromLocalStorage('calendar_tasks', []),
+            sundayFirst: loadFromLocalStorage('sunday_first', false),
+
+            init() {
+                document.getElementById('prevMonth').addEventListener('click', () => this.changeMonth(-1));
+                document.getElementById('nextMonth').addEventListener('click', () => this.changeMonth(1));
+                document.getElementById('sundayStart').addEventListener('change', (e) => {
+                    this.sundayFirst = e.target.checked;
+                    saveToLocalStorage('sunday_first', this.sundayFirst);
+                    this.render();
+                });
+                document.getElementById('addTaskBtn').addEventListener('click', () => this.addTask());
+                
+                // Initialize collapsible
+                initCollapsible('taskHeader', 'taskContent');
+                
+                // Load saved state
+                document.getElementById('sundayStart').checked = this.sundayFirst;
+                
+                // Set today's date as default
+                this.setTodayAsDefault();
+                
+                this.render();
+                this.renderTasks();
+            },
+
+            setTodayAsDefault() {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                document.getElementById('taskDate').value = `${year}-${month}-${day}`;
+            },
+
+            changeMonth(delta) {
+                this.currentDate.setMonth(this.currentDate.getMonth() + delta);
+                this.render();
+            },
+
+            render() {
+                const container = document.getElementById('calendarsContainer');
+                container.innerHTML = '';
+                
+                // Previous month
+                const prevMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() - 1);
+                container.appendChild(this.createCalendar(prevMonth, 'mini-calendar'));
+                
+                // Current month
+                container.appendChild(this.createCalendar(this.currentDate, 'main-calendar'));
+                
+                // Next month
+                const nextMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1);
+                container.appendChild(this.createCalendar(nextMonth, 'mini-calendar'));
+                
+                // Update month/year display
+                const monthYear = this.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                document.getElementById('currentMonthYear').textContent = monthYear;
+            },
+
+            createCalendar(date, className) {
+                const calendar = document.createElement('div');
+                calendar.className = className;
+                
+                const grid = document.createElement('div');
+                grid.className = 'calendar-grid';
+                
+                // Headers
+                const days = this.sundayFirst 
+                    ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+                    : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                
+                days.forEach(day => {
+                    const header = document.createElement('div');
+                    header.className = 'calendar-header';
+                    header.textContent = day;
+                    grid.appendChild(header);
+                });
+                
+                // Days
+                const year = date.getFullYear();
+                const month = date.getMonth();
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                
+                // Adjust first day based on week start
+                const startDay = this.sundayFirst ? firstDay : (firstDay === 0 ? 6 : firstDay - 1);
+                
+                // Previous month days
+                const prevMonthDays = new Date(year, month, 0).getDate();
+                for (let i = startDay - 1; i >= 0; i--) {
+                    const dayEl = this.createDayElement(prevMonthDays - i, true);
+                    grid.appendChild(dayEl);
+                }
+                
+                // Current month days
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayEl = this.createDayElement(day, false);
+                    const currentDay = new Date(year, month, day);
+                    currentDay.setHours(0, 0, 0, 0);
+                    
+                    // Check if today
+                    if (currentDay.getTime() === today.getTime()) {
+                        dayEl.classList.add('today');
+                    }
+                    
+                    // Check if past
+                    if (currentDay < today) {
+                        dayEl.classList.add('past');
+                    }
+                    
+                    // Check if has task
+                    const dateStr = this.formatDate(currentDay);
+                    if (this.tasks.some(t => t.date === dateStr)) {
+                        dayEl.classList.add('has-task');
+                    }
+                    
+                    grid.appendChild(dayEl);
+                }
+                
+                // Next month days
+                const remainingCells = 42 - (startDay + daysInMonth);
+                for (let day = 1; day <= remainingCells; day++) {
+                    const dayEl = this.createDayElement(day, true);
+                    grid.appendChild(dayEl);
+                }
+                
+                calendar.appendChild(grid);
+                return calendar;
+            },
+
+            createDayElement(day, otherMonth) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day';
+                if (otherMonth) dayEl.classList.add('other-month');
+                dayEl.textContent = day;
+                return dayEl;
+            },
+
+            formatDate(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            },
+
+            addTask() {
+                const input = document.getElementById('taskInput');
+                const dateInput = document.getElementById('taskDate');
+                
+                if (!input.value.trim() || !dateInput.value) {
+                    alert('Please enter both task and date');
+                    return;
+                }
+                
+                this.tasks.push({
+                    id: Date.now(),
+                    text: input.value.trim(),
+                    date: dateInput.value
+                });
+                
+                saveToLocalStorage('calendar_tasks', this.tasks);
+                
+                input.value = '';
+                this.setTodayAsDefault();
+                
+                this.render();
+                this.renderTasks();
+            },
+
+            deleteTask(id) {
+                this.tasks = this.tasks.filter(t => t.id !== id);
+                saveToLocalStorage('calendar_tasks', this.tasks);
+                this.render();
+                this.renderTasks();
+            },
+
+            renderTasks() {
+                const list = document.getElementById('tasksList');
+                list.innerHTML = '';
+                
+                if (this.tasks.length === 0) {
+                    list.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 1rem;">No tasks yet</p>';
+                    return;
+                }
+                
+                // Sort by date
+                const sorted = [...this.tasks].sort((a, b) => new Date(a.date) - new Date(b.date));
+                
+                sorted.forEach(task => {
+                    const item = document.createElement('div');
+                    item.className = 'task-item';
+                    
+                    const info = document.createElement('div');
+                    info.className = 'task-info';
+                    
+                    const text = document.createElement('div');
+                    text.className = 'task-text';
+                    text.textContent = task.text;
+                    
+                    const date = document.createElement('div');
+                    date.className = 'task-date-display';
+                    const [year, month, day] = task.date.split('-');
+                    const taskDate = new Date(year, month - 1, day);
+                    date.textContent = taskDate.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                    });
+                    
+                    info.appendChild(text);
+                    info.appendChild(date);
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'task-delete';
+                    deleteBtn.textContent = '×';
+                    deleteBtn.addEventListener('click', () => this.deleteTask(task.id));
+                    
+                    item.appendChild(info);
+                    item.appendChild(deleteBtn);
+                    list.appendChild(item);
+                });
+            }
+        };
+
+        // RADIO MODULE
+        const RadioModule = {
+            audio: new Audio(),
+            stations: loadFromLocalStorage('radio_stations', []),
+            currentStation: null,
+            isPlaying: false,
+
+            init() {
+                this.audio.volume = 0.3;
+                
+                document.getElementById('playBtn').addEventListener('click', () => this.togglePlay());
+                document.getElementById('stopBtn').addEventListener('click', () => this.stop());
+                document.getElementById('volumeSlider').addEventListener('input', (e) => {
+                    this.audio.volume = e.target.value / 100;
+                });
+                document.getElementById('addStationBtn').addEventListener('click', () => this.addStation());
+                
+                // Initialize collapsibles
+                initCollapsible('stationsListHeader', 'stationsListContent');
+                initCollapsible('stationHeader', 'stationContent');
+                
+                this.audio.addEventListener('play', () => this.onPlay());
+                this.audio.addEventListener('pause', () => this.onPause());
+                this.audio.addEventListener('error', () => this.onError());
+                
+                this.renderStations();
+            },
+
+            addStation() {
+                const title = document.getElementById('stationTitle').value.trim();
+                const url = document.getElementById('stationUrl').value.trim();
+                
+                if (!title || !url) {
+                    alert('Please fill in both fields');
+                    return;
+                }
+                
+                this.stations.push({ title, url });
+                saveToLocalStorage('radio_stations', this.stations);
+                
+                document.getElementById('stationTitle').value = '';
+                document.getElementById('stationUrl').value = '';
+                
+                this.renderStations();
+            },
+
+            deleteStation(index) {
+                if (confirm(`Delete "${this.stations[index].title}"?`)) {
+                    if (this.currentStation === index) {
+                        this.stop();
+                        this.currentStation = null;
+                    }
+                    this.stations.splice(index, 1);
+                    saveToLocalStorage('radio_stations', this.stations);
+                    this.renderStations();
+                }
+            },
+
+            selectStation(index) {
+                this.stop();
+                this.currentStation = index;
+                this.audio.src = this.stations[index].url;
+                document.getElementById('stationName').textContent = this.stations[index].title;
+                this.renderStations();
+                this.play();
+            },
+
+            togglePlay() {
+                if (this.currentStation === null && this.stations.length > 0) {
+                    this.selectStation(0);
+                } else if (this.currentStation !== null) {
+                    this.isPlaying ? this.pause() : this.play();
+                } else {
+                    alert('Add a station first');
+                }
+            },
+
+            play() {
+                this.audio.play().catch(err => {
+                    console.error('Playback error:', err);
+                    alert('Error playing stream');
+                });
+            },
+
+            pause() {
+                this.audio.pause();
+            },
+
+            stop() {
+                this.audio.pause();
+                this.audio.currentTime = 0;
+                this.isPlaying = false;
+                document.getElementById('playBtn').innerHTML = '▶';
+                document.getElementById('playBtn').classList.remove('playing');
+            },
+
+            onPlay() {
+                this.isPlaying = true;
+                document.getElementById('playBtn').innerHTML = '❚❚';
+                document.getElementById('playBtn').classList.add('playing');
+            },
+
+            onPause() {
+                this.isPlaying = false;
+                document.getElementById('playBtn').innerHTML = '▶';
+                document.getElementById('playBtn').classList.remove('playing');
+            },
+
+            onError() {
+                alert('Error loading stream');
+                this.stop();
+            },
+
+            renderStations() {
+                const list = document.getElementById('stationsList');
+                list.innerHTML = '';
+                
+                if (this.stations.length === 0) {
+                    list.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 1rem;">No stations saved</p>';
+                    return;
+                }
+                
+                this.stations.forEach((station, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'station-item';
+                    if (index === this.currentStation) {
+                        item.classList.add('active');
+                    }
+                    
+                    item.innerHTML = `
+                        <div class="station-item-title">${station.title}</div>
+                        <div class="station-item-url">${station.url}</div>
+                        <button class="delete-btn">×</button>
+                    `;
+                    
+                    item.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('delete-btn')) {
+                            this.selectStation(index);
+                        }
+                    });
+                    
+                    item.querySelector('.delete-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.deleteStation(index);
+                    });
+                    
+                    list.appendChild(item);
+                });
+            }
+        };
+
+        // PROMPT MANAGER MODULE
+        const PromptManager = {
+            prompts: loadFromLocalStorage('prompts', []),
+            editingIndex: -1,
+
+            init() {
+                document.getElementById('addNoteBtn').addEventListener('click', () => this.openModal());
+                document.getElementById('closeNoteModal').addEventListener('click', () => this.closeModal());
+                document.getElementById('savePromptBtn').addEventListener('click', () => this.savePrompt());
+                document.getElementById('cancelPromptBtn').addEventListener('click', () => this.closeModal());
+                
+                // Close modal on overlay click
+                document.getElementById('noteModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'noteModal') {
+                        this.closeModal();
+                    }
+                });
+                
+                this.renderPrompts();
+            },
+
+            openModal(index = -1) {
+                this.editingIndex = index;
+                const modal = document.getElementById('noteModal');
+                const titleEl = document.getElementById('noteModalTitle');
+                
+                if (index >= 0) {
+                    const prompt = this.prompts[index];
+                    document.getElementById('promptTitle').value = prompt.title;
+                    document.getElementById('promptContent').value = prompt.content;
+                    titleEl.textContent = 'Edit Note';
+                } else {
+                    document.getElementById('promptTitle').value = '';
+                    document.getElementById('promptContent').value = '';
+                    titleEl.textContent = 'Add Note';
+                }
+                
+                modal.classList.add('active');
+                setTimeout(() => document.getElementById('promptTitle').focus(), 100);
+            },
+
+            closeModal() {
+                const modal = document.getElementById('noteModal');
+                modal.classList.remove('active');
+                this.editingIndex = -1;
+            },
+
+            savePrompt() {
+                const title = document.getElementById('promptTitle').value.trim();
+                const content = document.getElementById('promptContent').value.trim();
+                
+                if (!title || !content) {
+                    alert('Please fill in both fields');
+                    return;
+                }
+                
+                if (this.editingIndex >= 0) {
+                    this.prompts[this.editingIndex] = { title, content };
+                } else {
+                    this.prompts.unshift({ title, content });
+                }
+                
+                saveToLocalStorage('prompts', this.prompts);
+                this.renderPrompts();
+                this.closeModal();
+            },
+
+            editPrompt(index) {
+                this.openModal(index);
+            },
+
+            deletePrompt(index) {
+                if (confirm('Delete this note?')) {
+                    this.prompts.splice(index, 1);
+                    saveToLocalStorage('prompts', this.prompts);
+                    this.renderPrompts();
+                }
+            },
+
+            copyPrompt(content) {
+                navigator.clipboard.writeText(content).then(() => {
+                    alert('Copied to clipboard!');
+                });
+            },
+
+            renderPrompts() {
+                const list = document.getElementById('promptsList');
+                list.innerHTML = '';
+                
+                if (this.prompts.length === 0) {
+                    list.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 1rem;">No notes saved</p>';
+                    return;
+                }
+                
+                this.prompts.forEach((prompt, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'prompt-card';
+                    
+                    const preview = prompt.content.substring(0, 100) + (prompt.content.length > 100 ? '...' : '');
+                    
+                    card.innerHTML = `
+                        <div class="prompt-header">
+                            <div class="prompt-title">${prompt.title}</div>
+                            <div class="prompt-actions">
+                                <button class="btn-icon" onclick="PromptManager.copyPrompt(\`${prompt.content.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`)">⎘</button>
+                                <button class="btn-icon" onclick="PromptManager.editPrompt(${index})">✎</button>
+                                <button class="btn-icon" onclick="PromptManager.deletePrompt(${index})">×</button>
+                            </div>
+                        </div>
+                        <div class="prompt-content">${preview}</div>
+                    `;
+                    
+                    list.appendChild(card);
+                });
+            }
+        };
+
+        // PAINT MODULE
+        const PaintModule = {
+            canvas: null,
+            ctx: null,
+            drawingCanvas: null, // Separate canvas for drawings
+            drawingCtx: null,
+            isDrawing: false,
+            lastX: 0,
+            lastY: 0,
+            currentTool: 'brush',
+            isEraser: false,
+            isFullscreen: false,
+            isDragging: false,
+            dragStartX: 0,
+            dragStartY: 0,
+            selectedObject: null,
+            objects: [], // Store text and images for dragging
+
+            init() {
+                this.canvas = document.getElementById('paintCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                
+                // Create off-screen canvas for drawings
+                this.drawingCanvas = document.createElement('canvas');
+                this.drawingCtx = this.drawingCanvas.getContext('2d');
+                
+                // Wait for next frame to ensure DOM is painted
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        this.initializeCanvas();
+                    });
+                });
+                
+                // Event listeners
+                this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+                this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+                this.canvas.addEventListener('mouseup', () => this.handleMouseUp());
+                this.canvas.addEventListener('mouseout', () => this.handleMouseUp());
+                
+                // Touch events
+                this.canvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.handleMouseDown(e.touches[0]);
+                });
+                this.canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    this.handleMouseMove(e.touches[0]);
+                });
+                this.canvas.addEventListener('touchend', () => this.handleMouseUp());
+                
+                // Tool buttons
+                document.getElementById('brushBtn').addEventListener('click', () => this.setTool('brush'));
+                document.getElementById('eraserBtn').addEventListener('click', () => this.setTool('eraser'));
+                document.getElementById('textBtn').addEventListener('click', () => this.setTool('text'));
+                document.getElementById('pasteBtn').addEventListener('click', () => this.pasteImage());
+                document.getElementById('clearCanvas').addEventListener('click', () => this.clear());
+                document.getElementById('saveCanvas').addEventListener('click', () => this.save());
+                document.getElementById('fullscreenCanvas').addEventListener('click', () => this.toggleFullscreen());
+                document.getElementById('addTextBtn').addEventListener('click', () => this.addText());
+                
+                // Resize handler
+                window.addEventListener('resize', () => {
+                    if (!this.isFullscreen) {
+                        this.resizeCanvas();
+                    }
+                });
+                
+                // ESC key to exit fullscreen
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && this.isFullscreen) {
+                        this.toggleFullscreen();
+                    }
+                });
+            },
+
+            initializeCanvas() {
+                const rect = this.canvas.getBoundingClientRect();
+                
+                if (rect.width === 0 || rect.height === 0) {
+                    // Try again in next frame
+                    requestAnimationFrame(() => this.initializeCanvas());
+                    return;
+                }
+                
+                this.canvas.width = rect.width;
+                this.canvas.height = rect.height;
+                this.drawingCanvas.width = rect.width;
+                this.drawingCanvas.height = rect.height;
+                
+                // Fill with white
+                this.drawingCtx.fillStyle = '#ffffff';
+                this.drawingCtx.fillRect(0, 0, this.drawingCanvas.width, this.drawingCanvas.height);
+                
+                this.redrawCanvas();
+            },
+
+            resizeCanvas() {
+                const rect = this.canvas.getBoundingClientRect();
+                
+                // Don't resize if dimensions are invalid
+                if (rect.width === 0 || rect.height === 0) {
+                    return;
+                }
+                
+                // Save current drawing state
+                let drawingData = null;
+                if (this.drawingCanvas && this.drawingCanvas.width > 0 && this.drawingCanvas.height > 0) {
+                    try {
+                        drawingData = this.drawingCtx.getImageData(0, 0, this.drawingCanvas.width, this.drawingCanvas.height);
+                    } catch (e) {
+                        // Ignore if canvas isn't ready
+                    }
+                }
+                
+                this.canvas.width = rect.width;
+                this.canvas.height = rect.height;
+                this.drawingCanvas.width = rect.width;
+                this.drawingCanvas.height = rect.height;
+                
+                // Fill drawing canvas with white background
+                this.drawingCtx.fillStyle = '#ffffff';
+                this.drawingCtx.fillRect(0, 0, this.drawingCanvas.width, this.drawingCanvas.height);
+                
+                // Restore drawing if we had previous data
+                if (drawingData) {
+                    try {
+                        this.drawingCtx.putImageData(drawingData, 0, 0);
+                    } catch (e) {
+                        // Ignore if restore fails
+                    }
+                }
+                
+                this.redrawCanvas();
+            },
+
+            setTool(tool) {
+                this.currentTool = tool === 'eraser' ? 'brush' : tool;
+                this.isEraser = tool === 'eraser';
+                
+                // Update button states
+                document.getElementById('brushBtn').classList.toggle('active', tool === 'brush');
+                document.getElementById('eraserBtn').classList.toggle('active', tool === 'eraser');
+                document.getElementById('textBtn').classList.toggle('active', tool === 'text');
+                
+                // Show/hide text input
+                document.getElementById('textInputContainer').classList.toggle('active', tool === 'text');
+                
+                // Update cursor
+                if (tool === 'text') {
+                    this.canvas.style.cursor = 'text';
+                } else if (tool === 'brush' || tool === 'eraser') {
+                    this.canvas.style.cursor = 'crosshair';
+                } else {
+                    this.canvas.style.cursor = 'move';
+                }
+            },
+
+            toggleFullscreen() {
+                const container = document.getElementById('paintCanvasContainer');
+                const btn = document.getElementById('fullscreenCanvas');
+                this.isFullscreen = !this.isFullscreen;
+                
+                if (this.isFullscreen) {
+                    // Save current drawing state at original size
+                    const savedDrawing = this.drawingCtx.getImageData(0, 0, this.drawingCanvas.width, this.drawingCanvas.height);
+                    const savedObjects = JSON.parse(JSON.stringify(this.objects.map(obj => {
+                        if (obj.type === 'image') {
+                            return { ...obj, img: obj.img }; // Keep image reference
+                        }
+                        return obj;
+                    })));
+                    
+                    container.classList.add('fullscreen');
+                    btn.textContent = 'Exit Fullscreen';
+                    
+                    // Wait for CSS transition then resize
+                    setTimeout(() => {
+                        const rect = container.getBoundingClientRect();
+                        const oldWidth = this.canvas.width;
+                        const oldHeight = this.canvas.height;
+                        const newWidth = rect.width - 32;
+                        const newHeight = rect.height - 32;
+                        
+                        // Calculate scale factors
+                        const scaleX = newWidth / oldWidth;
+                        const scaleY = newHeight / oldHeight;
+                        
+                        // Resize canvases
+                        this.canvas.width = newWidth;
+                        this.canvas.height = newHeight;
+                        
+                        // Create temporary canvas to scale the drawing
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = oldWidth;
+                        tempCanvas.height = oldHeight;
+                        const tempCtx = tempCanvas.getContext('2d');
+                        tempCtx.putImageData(savedDrawing, 0, 0);
+                        
+                        // Resize drawing canvas and scale content
+                        this.drawingCanvas.width = newWidth;
+                        this.drawingCanvas.height = newHeight;
+                        this.drawingCtx.fillStyle = '#ffffff';
+                        this.drawingCtx.fillRect(0, 0, newWidth, newHeight);
+                        this.drawingCtx.drawImage(tempCanvas, 0, 0, oldWidth, oldHeight, 0, 0, newWidth, newHeight);
+                        
+                        // Scale object positions
+                        this.objects = savedObjects.map(obj => {
+                            return {
+                                ...obj,
+                                x: obj.x * scaleX,
+                                y: obj.y * scaleY,
+                                width: obj.width ? obj.width * scaleX : obj.width,
+                                height: obj.height ? obj.height * scaleY : obj.height
+                            };
+                        });
+                        
+                        this.redrawCanvas();
+                    }, 50);
+                } else {
+                    // Save current fullscreen state
+                    const savedDrawing = this.drawingCtx.getImageData(0, 0, this.drawingCanvas.width, this.drawingCanvas.height);
+                    const savedObjects = JSON.parse(JSON.stringify(this.objects.map(obj => {
+                        if (obj.type === 'image') {
+                            return { ...obj, img: obj.img }; // Keep image reference
+                        }
+                        return obj;
+                    })));
+                    
+                    container.classList.remove('fullscreen');
+                    btn.textContent = 'Fullscreen';
+                    
+                    // Wait for CSS transition then resize
+                    setTimeout(() => {
+                        const rect = this.canvas.getBoundingClientRect();
+                        const oldWidth = this.canvas.width;
+                        const oldHeight = this.canvas.height;
+                        const newWidth = rect.width;
+                        const newHeight = rect.height;
+                        
+                        // Calculate scale factors
+                        const scaleX = newWidth / oldWidth;
+                        const scaleY = newHeight / oldHeight;
+                        
+                        // Resize canvases
+                        this.canvas.width = newWidth;
+                        this.canvas.height = newHeight;
+                        
+                        // Create temporary canvas to scale the drawing
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = oldWidth;
+                        tempCanvas.height = oldHeight;
+                        const tempCtx = tempCanvas.getContext('2d');
+                        tempCtx.putImageData(savedDrawing, 0, 0);
+                        
+                        // Resize drawing canvas and scale content
+                        this.drawingCanvas.width = newWidth;
+                        this.drawingCanvas.height = newHeight;
+                        this.drawingCtx.fillStyle = '#ffffff';
+                        this.drawingCtx.fillRect(0, 0, newWidth, newHeight);
+                        this.drawingCtx.drawImage(tempCanvas, 0, 0, oldWidth, oldHeight, 0, 0, newWidth, newHeight);
+                        
+                        // Scale object positions
+                        this.objects = savedObjects.map(obj => {
+                            return {
+                                ...obj,
+                                x: obj.x * scaleX,
+                                y: obj.y * scaleY,
+                                width: obj.width ? obj.width * scaleX : obj.width,
+                                height: obj.height ? obj.height * scaleY : obj.height
+                            };
+                        });
+                        
+                        this.redrawCanvas();
+                    }, 50);
+                }
+            },
+
+            handleMouseDown(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) * (this.canvas.width / rect.width);
+                const y = (e.clientY - rect.top) * (this.canvas.height / rect.height);
+                
+                // Check if clicking on an object (for dragging)
+                for (let i = this.objects.length - 1; i >= 0; i--) {
+                    const obj = this.objects[i];
+                    if (this.isPointInObject(x, y, obj)) {
+                        this.isDragging = true;
+                        this.selectedObject = obj;
+                        this.dragStartX = x - obj.x;
+                        this.dragStartY = y - obj.y;
+                        this.canvas.style.cursor = 'grabbing';
+                        return;
+                    }
+                }
+                
+                // If not dragging, handle based on current tool
+                if (this.currentTool === 'brush') {
+                    this.isDrawing = true;
+                    this.lastX = x;
+                    this.lastY = y;
+                } else if (this.currentTool === 'text') {
+                    this.placeText(e);
+                }
+            },
+
+            handleMouseMove(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) * (this.canvas.width / rect.width);
+                const y = (e.clientY - rect.top) * (this.canvas.height / rect.height);
+                
+                if (this.isDragging && this.selectedObject) {
+                    // Update object position
+                    this.selectedObject.x = x - this.dragStartX;
+                    this.selectedObject.y = y - this.dragStartY;
+                    
+                    // Redraw everything
+                    this.redrawCanvas();
+                    return;
+                }
+                
+                if (this.isDrawing && this.currentTool === 'brush') {
+                    const color = document.getElementById('paintColor').value;
+                    const size = document.getElementById('brushSize').value;
+                    
+                    // Draw on the drawing canvas
+                    this.drawingCtx.beginPath();
+                    this.drawingCtx.moveTo(this.lastX, this.lastY);
+                    this.drawingCtx.lineTo(x, y);
+                    this.drawingCtx.strokeStyle = this.isEraser ? '#ffffff' : color;
+                    this.drawingCtx.lineWidth = size;
+                    this.drawingCtx.lineCap = 'round';
+                    this.drawingCtx.lineJoin = 'round';
+                    this.drawingCtx.stroke();
+                    
+                    // Update main canvas
+                    this.redrawCanvas();
+                    
+                    this.lastX = x;
+                    this.lastY = y;
+                }
+                
+                // Update cursor if hovering over object
+                let isOverObject = false;
+                for (let i = this.objects.length - 1; i >= 0; i--) {
+                    if (this.isPointInObject(x, y, this.objects[i])) {
+                        isOverObject = true;
+                        break;
+                    }
+                }
+                
+                if (!this.isDragging && !this.isDrawing) {
+                    this.canvas.style.cursor = isOverObject ? 'grab' : (this.currentTool === 'text' ? 'text' : 'crosshair');
+                }
+            },
+
+            handleMouseUp() {
+                this.isDrawing = false;
+                this.isDragging = false;
+                this.selectedObject = null;
+                
+                if (this.currentTool === 'text') {
+                    this.canvas.style.cursor = 'text';
+                } else if (this.currentTool === 'brush') {
+                    this.canvas.style.cursor = 'crosshair';
+                } else {
+                    this.canvas.style.cursor = 'move';
+                }
+            },
+
+            isPointInObject(x, y, obj) {
+                if (obj.type === 'text') {
+                    // Approximate text bounds
+                    const width = obj.width || 100;
+                    const height = obj.height || 30;
+                    return x >= obj.x && x <= obj.x + width && 
+                           y >= obj.y - height && y <= obj.y;
+                } else if (obj.type === 'image') {
+                    return x >= obj.x && x <= obj.x + obj.width && 
+                           y >= obj.y && y <= obj.y + obj.height;
+                }
+                return false;
+            },
+
+            redrawCanvas() {
+                // Clear main canvas
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw the drawing layer first (background) - only if valid
+                if (this.drawingCanvas && this.drawingCanvas.width > 0 && this.drawingCanvas.height > 0) {
+                    this.ctx.drawImage(this.drawingCanvas, 0, 0);
+                }
+                
+                // Draw all objects on top
+                this.objects.forEach(obj => {
+                    if (obj.type === 'text') {
+                        this.ctx.font = `${obj.fontSize}px 'Montserrat', sans-serif`;
+                        this.ctx.fillStyle = obj.color;
+                        this.ctx.fillText(obj.text, obj.x, obj.y);
+                    } else if (obj.type === 'image') {
+                        if (obj.img && obj.img.complete && obj.img.naturalWidth > 0) {
+                            this.ctx.drawImage(obj.img, obj.x, obj.y, obj.width, obj.height);
+                        }
+                    }
+                });
+            },
+
+            placeText(e) {
+                const text = document.getElementById('textInput').value.trim();
+                if (!text) {
+                    alert('Please enter text first');
+                    return;
+                }
+                
+                const rect = this.canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) * (this.canvas.width / rect.width);
+                const y = (e.clientY - rect.top) * (this.canvas.height / rect.height);
+                
+                const color = document.getElementById('paintColor').value;
+                const fontSize = parseInt(document.getElementById('fontSize').value);
+                
+                // Measure text width
+                this.ctx.font = `${fontSize}px 'Montserrat', sans-serif`;
+                const metrics = this.ctx.measureText(text);
+                
+                // Add to objects array
+                this.objects.push({
+                    type: 'text',
+                    text: text,
+                    x: x,
+                    y: y,
+                    color: color,
+                    fontSize: fontSize,
+                    width: metrics.width,
+                    height: fontSize
+                });
+                
+                // Redraw canvas
+                this.redrawCanvas();
+            },
+
+            addText() {
+                const text = document.getElementById('textInput').value.trim();
+                if (!text) {
+                    alert('Please enter text first');
+                    return;
+                }
+                
+                const color = document.getElementById('paintColor').value;
+                const fontSize = parseInt(document.getElementById('fontSize').value);
+                
+                const x = this.canvas.width / 2;
+                const y = this.canvas.height / 2;
+                
+                // Measure text width
+                this.ctx.font = `${fontSize}px 'Montserrat', sans-serif`;
+                const metrics = this.ctx.measureText(text);
+                
+                // Add to objects array
+                this.objects.push({
+                    type: 'text',
+                    text: text,
+                    x: x,
+                    y: y,
+                    color: color,
+                    fontSize: fontSize,
+                    width: metrics.width,
+                    height: fontSize
+                });
+                
+                // Redraw canvas
+                this.redrawCanvas();
+                
+                document.getElementById('textInput').value = '';
+            },
+
+            async pasteImage() {
+                try {
+                    const clipboardItems = await navigator.clipboard.read();
+                    
+                    for (const item of clipboardItems) {
+                        for (const type of item.types) {
+                            if (type.startsWith('image/')) {
+                                const blob = await item.getType(type);
+                                const img = new Image();
+                                
+                                img.onload = () => {
+                                    // Calculate scaled dimensions
+                                    const maxWidth = this.canvas.width * 0.6;
+                                    const maxHeight = this.canvas.height * 0.6;
+                                    
+                                    let width = img.width;
+                                    let height = img.height;
+                                    
+                                    if (width > maxWidth || height > maxHeight) {
+                                        const ratio = Math.min(maxWidth / width, maxHeight / height);
+                                        width *= ratio;
+                                        height *= ratio;
+                                    }
+                                    
+                                    const x = (this.canvas.width - width) / 2;
+                                    const y = (this.canvas.height - height) / 2;
+                                    
+                                    // Add to objects array
+                                    this.objects.push({
+                                        type: 'image',
+                                        img: img,
+                                        x: x,
+                                        y: y,
+                                        width: width,
+                                        height: height
+                                    });
+                                    
+                                    // Redraw canvas
+                                    this.redrawCanvas();
+                                };
+                                
+                                img.src = URL.createObjectURL(blob);
+                                return;
+                            }
+                        }
+                    }
+                    
+                    alert('No image found in clipboard');
+                } catch (err) {
+                    console.error('Paste error:', err);
+                    alert('Error pasting image. Make sure you have copied an image to clipboard.');
+                }
+            },
+
+            clear() {
+                this.objects = [];
+                
+                // Clear drawing canvas
+                this.drawingCtx.fillStyle = '#ffffff';
+                this.drawingCtx.fillRect(0, 0, this.drawingCanvas.width, this.drawingCanvas.height);
+                
+                // Redraw main canvas
+                this.redrawCanvas();
+            },
+
+            save() {
+                const link = document.createElement('a');
+                link.download = 'painting.png';
+                link.href = this.canvas.toDataURL();
+                link.click();
+            }
+        };
+
+        // EXPORT/IMPORT MODULE
+        const DataManager = {
+            init() {
+                document.getElementById('exportAllBtn').addEventListener('click', () => this.exportAll());
+                document.getElementById('importAllBtn').addEventListener('click', () => {
+                    document.getElementById('importFile').click();
+                });
+                document.getElementById('importFile').addEventListener('change', (e) => this.importAll(e));
+            },
+
+            exportAll() {
+                const data = {
+                    settings: {
+                        show_calendar: loadFromLocalStorage('show_calendar', true),
+                        show_radio: loadFromLocalStorage('show_radio', true),
+                        show_prompts: loadFromLocalStorage('show_prompts', true),
+                        show_paint: loadFromLocalStorage('show_paint', true),
+                        show_export: loadFromLocalStorage('show_export', true),
+                        sunday_first: loadFromLocalStorage('sunday_first', false)
+                    },
+                    calendar_tasks: loadFromLocalStorage('calendar_tasks', []),
+                    radio_stations: loadFromLocalStorage('radio_stations', []),
+                    prompts: loadFromLocalStorage('prompts', [])
+                };
+
+                let csv = 'TYPE,DATA\n';
+                
+                csv += `SETTINGS,"${JSON.stringify(data.settings).replace(/"/g, '""')}"\n`;
+                
+                data.calendar_tasks.forEach(task => {
+                    csv += `TASK,"${JSON.stringify(task).replace(/"/g, '""')}"\n`;
+                });
+                
+                data.radio_stations.forEach(station => {
+                    csv += `STATION,"${JSON.stringify(station).replace(/"/g, '""')}"\n`;
+                });
+                
+                data.prompts.forEach(prompt => {
+                    csv += `NOTE,"${JSON.stringify(prompt).replace(/"/g, '""')}"\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', `productivity-hub-backup-${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                alert('All data exported successfully!');
+            },
+
+            importAll(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const content = e.target.result;
+                        const lines = content.split('\n').filter(line => line.trim());
+                        
+                        lines.shift();
+                        
+                        const imported = {
+                            settings: null,
+                            tasks: [],
+                            stations: [],
+                            prompts: []
+                        };
+                        
+                        lines.forEach(line => {
+                            const match = line.match(/^([^,]+),"(.*)"/);
+                            if (match) {
+                                const type = match[1];
+                                const data = JSON.parse(match[2].replace(/""/g, '"'));
+                                
+                                switch(type) {
+                                    case 'SETTINGS':
+                                        imported.settings = data;
+                                        break;
+                                    case 'TASK':
+                                        imported.tasks.push(data);
+                                        break;
+                                    case 'STATION':
+                                        imported.stations.push(data);
+                                        break;
+                                    case 'NOTE':
+                                    case 'PROMPT':
+                                        imported.prompts.push(data);
+                                        break;
+                                }
+                            }
+                        });
+
+                        if (confirm(`Import data?\n\nSettings: ${imported.settings ? 'Yes' : 'No'}\nTasks: ${imported.tasks.length}\nStations: ${imported.stations.length}\nNotes: ${imported.prompts.length}\n\nThis will replace your current data.`)) {
+                            if (imported.settings) {
+                                Object.keys(imported.settings).forEach(key => {
+                                    saveToLocalStorage(key, imported.settings[key]);
+                                });
+                            }
+                            
+                            saveToLocalStorage('calendar_tasks', imported.tasks);
+                            saveToLocalStorage('radio_stations', imported.stations);
+                            saveToLocalStorage('prompts', imported.prompts);
+                            
+                            alert('Data imported successfully! Reloading page...');
+                            location.reload();
+                        }
+                    } catch (err) {
+                        console.error('Import error:', err);
+                        alert('Error importing file. Please check the file format.');
+                    }
+                    
+                    event.target.value = '';
+                };
+
+                reader.readAsText(file);
+            }
+        };
+
+        // INITIALIZE ALL MODULES
+        document.addEventListener('DOMContentLoaded', () => {
+            FullscreenModule.init();
+            ClockModule.init();
+            ComponentSelector.init();
+            CalendarModule.init();
+            RadioModule.init();
+            PromptManager.init();
+            PaintModule.init();
+            DataManager.init();
+        });
+    </script>
+</body>
+</html>
