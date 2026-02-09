@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Quiz Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-medium: #1a1a1a;
+            --bg-light: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent: #404040;
+            --border: #333333;
+            --correct: #00ff00;
+            --incorrect: #ff0000;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 40px;
+            max-width: 1400px;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+            transition: grid-template-columns 0.3s ease;
+        }
+
+        .container.sidebar-collapsed {
+            grid-template-columns: 1fr 0px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* QUIZ PLAYER */
+        .quiz-player {
+            background: var(--bg-medium);
+            border-radius: 24px;
+            padding: 60px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* DATETIME DISPLAY */
+        .datetime-display {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            text-align: left;
+            font-size: 11px;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+
+        .datetime-time {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .datetime-date {
+            font-weight: 300;
+        }
+
+        .quiz-player::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .quiz-title {
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .quiz-model {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        /* SCORE DISPLAY */
+        .score-display {
+            background: #000;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            border: 2px solid var(--border);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .score-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--correct);
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        /* PROGRESS BAR */
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: var(--bg-light);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--correct), #00cc00);
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        /* QUESTION DISPLAY */
+        .question-container {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .question-number {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .question-text {
+            font-size: 22px;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text-primary);
+        }
+
+        /* OPTIONS */
+        .options-container {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .option-btn {
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-letter {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .option-btn:not(:disabled):hover {
+            background: var(--accent);
+            transform: translateX(4px);
+            border-color: var(--text-secondary);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .option-btn.correct {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: var(--correct);
+            color: var(--correct);
+        }
+
+        .option-btn.correct .option-letter {
+            background: var(--correct);
+            color: var(--bg-dark);
+        }
+
+        .option-btn.incorrect {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: var(--incorrect);
+            color: var(--incorrect);
+        }
+
+        .option-btn.incorrect .option-letter {
+            background: var(--incorrect);
+            color: var(--text-primary);
+        }
+
+        /* CONTROLS */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .control-btn:not(:disabled):hover {
+            background: var(--accent);
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .control-btn.primary {
+            background: var(--text-primary);
+            color: var(--bg-dark);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 360px;
+            background: var(--bg-medium);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            opacity: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .collapse-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 18px;
+        }
+
+        .collapse-btn:hover {
+            background: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .expand-btn {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--bg-medium);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        .expand-btn.visible {
+            display: flex;
+        }
+
+        .expand-btn:hover {
+            background: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .import-export {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .import-export button {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        .import-export button:hover {
+            background: var(--accent);
+        }
+
+        .topics-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+
+        .topics-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .topics-list::-webkit-scrollbar-track {
+            background: var(--bg-light);
+            border-radius: 3px;
+        }
+
+        .topics-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .topics-list::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        .topic-item {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .topic-item:hover {
+            background: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .topic-item.active {
+            border-color: var(--correct);
+            box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.2);
+        }
+
+        .topic-item-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .topic-item-info {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            line-height: 1;
+            transition: all 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            background: var(--incorrect);
+            color: var(--text-primary);
+            border-color: var(--incorrect);
+        }
+
+        .clear-all-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        .clear-all-btn:hover {
+            background: var(--incorrect);
+            color: var(--text-primary);
+            border-color: var(--incorrect);
+        }
+
+        .welcome-screen {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .welcome-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            opacity: 0.3;
+        }
+
+        .welcome-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .welcome-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .results-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .results-icon {
+            font-size: 72px;
+            margin-bottom: 24px;
+        }
+
+        .results-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .results-score {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--correct);
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            margin-bottom: 24px;
+        }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-item {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .expand-btn.visible {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .quiz-player {
+                padding: 32px 24px;
+            }
+
+            .score-display {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .results-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="quiz-player">
+            <!-- DateTime Display -->
+            <div class="datetime-display">
+                <div class="datetime-time" id="time">00:00</div>
+                <div class="datetime-date" id="date">Loading...</div>
+            </div>
+
+            <!-- Header -->
+            <div class="quiz-header">
+                <div class="quiz-title">Language Learning</div>
+                <div class="quiz-model">QUIZ MASTER</div>
+            </div>
+
+            <!-- Welcome Screen -->
+            <div id="welcomeScreen" class="welcome-screen">
+                <div class="welcome-icon">🎯</div>
+                <div class="welcome-title">Welcome to the Language Quiz!</div>
+                <div class="welcome-text">
+                    Import a CSV file with translations to start learning.<br>
+                    Format: word1,word2<br>
+                    Example: hello,hola
+                </div>
+                <button class="control-btn primary" onclick="document.getElementById('fileInput').click()">
+                    Import CSV
+                </button>
+            </div>
+
+            <!-- Game Screen -->
+            <div id="gameScreen" style="display: none;">
+                <!-- Score Display -->
+                <div class="score-display">
+                    <div class="score-item">
+                        <div class="score-label">Score</div>
+                        <div class="score-value" id="scoreValue">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Question</div>
+                        <div class="score-value" id="questionNumber" style="color: var(--text-primary);">1/10</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Correct</div>
+                        <div class="score-value" id="correctCount" style="color: var(--text-primary);">0</div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-label">Quiz Progress</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <!-- Question -->
+                <div class="question-container">
+                    <div class="question-number">Question <span id="currentQuestion">1</span> of 10</div>
+                    <div class="question-text" id="questionText"></div>
+                </div>
+
+                <!-- Options -->
+                <div class="options-container" id="optionsContainer"></div>
+
+                <!-- Controls -->
+                <div class="controls">
+                    <button class="control-btn" id="nextBtn" onclick="quiz.nextQuestion()" disabled>
+                        Next
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="resultsScreen" style="display: none;">
+                <div class="results-screen">
+                    <div class="results-icon" id="resultsIcon">🎉</div>
+                    <div class="results-title">Quiz Completed!</div>
+                    <div class="results-score" id="finalScore">0 points</div>
+                    
+                    <div class="results-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Correct</div>
+                            <div class="stat-value" id="finalCorrect" style="color: var(--correct);">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Incorrect</div>
+                            <div class="stat-value" id="finalIncorrect" style="color: var(--incorrect);">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Accuracy</div>
+                            <div class="stat-value" id="finalAccuracy">0%</div>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="control-btn primary" onclick="quiz.restartQuiz()">
+                            Play Again
+                        </button>
+                        <button class="control-btn" onclick="quiz.backToWelcome()">
+                            Change Topic
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Topics</div>
+                <button class="collapse-btn" onclick="toggleSidebar()">→</button>
+            </div>
+
+            <div class="import-export">
+                <button onclick="document.getElementById('fileInput').click()">
+                    ↑ Import
+                </button>
+                <button onclick="quiz.exportCSV()">
+                    ↓ Export
+                </button>
+            </div>
+
+            <div class="topics-list" id="topicsList"></div>
+
+            <button class="clear-all-btn" onclick="quiz.clearAllTopics()">
+                Clear All
+            </button>
+        </div>
+    </div>
+
+    <!-- Expand Button (visible when sidebar is collapsed) -->
+    <button class="expand-btn" id="expandBtn" onclick="toggleSidebar()">
+        ←
+    </button>
+
+    <!-- Hidden File Input -->
+    <input type="file" id="fileInput" accept=".csv" style="display: none;">
+
+    <script>
+        class QuizGame {
+            constructor() {
+                this.topics = [];
+                this.currentTopic = null;
+                this.currentQuestions = [];
+                this.currentQuestionIndex = 0;
+                this.score = 0;
+                this.correctAnswers = 0;
+                this.incorrectAnswers = 0;
+                this.answered = false;
+                
+                this.loadTopics();
+                this.setupEventListeners();
+                this.renderTopics();
+                this.updateDateTime();
+                setInterval(() => this.updateDateTime(), 1000);
+            }
+
+            setupEventListeners() {
+                document.getElementById('fileInput').addEventListener('change', (e) => this.importCSV(e));
+            }
+
+            updateDateTime() {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                });
+                const dateStr = now.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                
+                document.getElementById('time').textContent = timeStr;
+                document.getElementById('date').textContent = dateStr;
+            }
+
+            loadTopics() {
+                const saved = localStorage.getItem('quizTopics');
+                if (saved) {
+                    this.topics = JSON.parse(saved);
+                }
+            }
+
+            saveTopics() {
+                localStorage.setItem('quizTopics', JSON.stringify(this.topics));
+            }
+
+            renderTopics() {
+                const list = document.getElementById('topicsList');
+                
+                if (this.topics.length === 0) {
+                    list.innerHTML = '<p style="color: var(--text-secondary); font-size: 12px; text-align: center; padding: 20px;">No saved topics</p>';
+                    return;
+                }
+
+                list.innerHTML = '';
+                this.topics.forEach((topic, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'topic-item';
+                    if (this.currentTopic && this.currentTopic.name === topic.name) {
+                        item.classList.add('active');
+                    }
+
+                    item.innerHTML = `
+                        <div class="topic-item-name">${topic.name}</div>
+                        <div class="topic-item-info">${topic.data.length} pairs</div>
+                        <button class="delete-btn">×</button>
+                    `;
+
+                    item.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('delete-btn')) {
+                            this.selectTopic(index);
+                        }
+                    });
+
+                    item.querySelector('.delete-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.deleteTopic(index);
+                    });
+
+                    list.appendChild(item);
+                });
+            }
+
+            selectTopic(index) {
+                this.currentTopic = this.topics[index];
+                this.renderTopics();
+                this.startQuiz();
+            }
+
+            deleteTopic(index) {
+                if (confirm(`Delete topic "${this.topics[index].name}"?`)) {
+                    this.topics.splice(index, 1);
+                    this.saveTopics();
+                    this.renderTopics();
+                    
+                    if (this.topics.length === 0) {
+                        this.backToWelcome();
+                    }
+                }
+            }
+
+            clearAllTopics() {
+                if (this.topics.length === 0) return;
+                
+                if (confirm(`Delete all ${this.topics.length} topics?`)) {
+                    this.topics = [];
+                    this.saveTopics();
+                    this.renderTopics();
+                    this.backToWelcome();
+                }
+            }
+
+            importCSV(event) {
+                const file = event.target.files[0];
+                if (!file) {
+                    console.log('No file selected');
+                    return;
+                }
+
+                console.log('File selected:', file.name);
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const text = e.target.result;
+                        console.log('File content:', text);
+                        
+                        const lines = text.split('\n').filter(line => line.trim());
+                        console.log('Lines:', lines);
+                        
+                        const data = lines.map(line => {
+                            const parts = line.split(',');
+                            const spanish = parts[0] ? parts[0].trim() : '';
+                            const foreign = parts[1] ? parts[1].trim() : '';
+                            return { spanish, foreign };
+                        }).filter(item => item.spanish && item.foreign);
+
+                        console.log('Parsed data:', data);
+
+                        if (data.length < 4) {
+                            alert(`The file must contain at least 4 word pairs.\nFound ${data.length} valid pairs.`);
+                            event.target.value = '';
+                            return;
+                        }
+
+                        const topicName = prompt('Topic name:', file.name.replace('.csv', ''));
+                        if (!topicName) {
+                            event.target.value = '';
+                            return;
+                        }
+
+                        const topic = {
+                            name: topicName,
+                            data: data,
+                            createdAt: new Date().toISOString()
+                        };
+
+                        this.topics.push(topic);
+                        this.saveTopics();
+                        this.renderTopics();
+                        
+                        console.log('Topic added:', topic);
+                        
+                        // Auto-select the new topic
+                        this.selectTopic(this.topics.length - 1);
+                        
+                        event.target.value = '';
+                    } catch (err) {
+                        console.error('Error reading CSV:', err);
+                        alert('Error reading CSV file: ' + err.message);
+                        event.target.value = '';
+                    }
+                };
+                
+                reader.onerror = (err) => {
+                    console.error('FileReader error:', err);
+                    alert('Error reading file');
+                    event.target.value = '';
+                };
+                
+                reader.readAsText(file, 'UTF-8');
+            }
+
+            exportCSV() {
+                if (!this.currentTopic) {
+                    alert('Select a topic first');
+                    return;
+                }
+
+                const csv = this.currentTopic.data
+                    .map(item => `${item.spanish},${item.foreign}`)
+                    .join('\n');
+                
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${this.currentTopic.name}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            startQuiz() {
+                if (!this.currentTopic || this.currentTopic.data.length < 4) {
+                    alert('This topic does not have enough data (minimum 4 pairs)');
+                    return;
+                }
+
+                // Reset game state
+                this.score = 0;
+                this.correctAnswers = 0;
+                this.incorrectAnswers = 0;
+                this.currentQuestionIndex = 0;
+                
+                // Generate 10 random questions
+                this.currentQuestions = this.generateQuestions(10);
+                
+                // Show game screen
+                document.getElementById('welcomeScreen').style.display = 'none';
+                document.getElementById('gameScreen').style.display = 'block';
+                document.getElementById('resultsScreen').style.display = 'none';
+                
+                this.showQuestion();
+            }
+
+            generateQuestions(count) {
+                const questions = [];
+                const data = [...this.currentTopic.data];
+                
+                // Shuffle and take first 'count' items
+                const shuffled = data.sort(() => Math.random() - 0.5);
+                const selected = shuffled.slice(0, Math.min(count, data.length));
+                
+                selected.forEach(correctAnswer => {
+                    // Get 3 wrong answers
+                    const wrongAnswers = data
+                        .filter(item => item.spanish !== correctAnswer.spanish)
+                        .sort(() => Math.random() - 0.5)
+                        .slice(0, 3);
+                    
+                    // Create options array with all answers
+                    const options = [correctAnswer, ...wrongAnswers]
+                        .sort(() => Math.random() - 0.5);
+                    
+                    questions.push({
+                        question: `What is: ${correctAnswer.spanish}?`,
+                        correct: correctAnswer.foreign,
+                        options: options.map(opt => opt.foreign)
+                    });
+                });
+                
+                return questions;
+            }
+
+            showQuestion() {
+                const question = this.currentQuestions[this.currentQuestionIndex];
+                this.answered = false;
+                
+                // Update UI
+                document.getElementById('questionText').textContent = question.question;
+                document.getElementById('currentQuestion').textContent = this.currentQuestionIndex + 1;
+                document.getElementById('questionNumber').textContent = `${this.currentQuestionIndex + 1}/10`;
+                document.getElementById('scoreValue').textContent = this.score;
+                document.getElementById('correctCount').textContent = this.correctAnswers;
+                
+                // Update progress bar
+                const progress = ((this.currentQuestionIndex) / 10) * 100;
+                document.getElementById('progressFill').style.width = `${progress}%`;
+                
+                // Create option buttons
+                const container = document.getElementById('optionsContainer');
+                container.innerHTML = '';
+                
+                const letters = ['A', 'B', 'C', 'D'];
+                question.options.forEach((option, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerHTML = `
+                        <div class="option-letter">${letters[index]}</div>
+                        <div>${option}</div>
+                    `;
+                    btn.onclick = () => this.checkAnswer(option, btn);
+                    container.appendChild(btn);
+                });
+                
+                document.getElementById('nextBtn').disabled = true;
+            }
+
+            checkAnswer(selected, button) {
+                if (this.answered) return;
+                
+                this.answered = true;
+                const question = this.currentQuestions[this.currentQuestionIndex];
+                const isCorrect = selected === question.correct;
+                
+                // Disable all buttons
+                const buttons = document.querySelectorAll('.option-btn');
+                buttons.forEach(btn => btn.disabled = true);
+                
+                if (isCorrect) {
+                    button.classList.add('correct');
+                    this.score += 10;
+                    this.correctAnswers++;
+                } else {
+                    button.classList.add('incorrect');
+                    this.incorrectAnswers++;
+                    
+                    // Highlight correct answer
+                    buttons.forEach(btn => {
+                        if (btn.textContent.trim().includes(question.correct)) {
+                            btn.classList.add('correct');
+                        }
+                    });
+                }
+                
+                // Update score display
+                document.getElementById('scoreValue').textContent = this.score;
+                document.getElementById('correctCount').textContent = this.correctAnswers;
+                
+                // Enable next button
+                document.getElementById('nextBtn').disabled = false;
+            }
+
+            nextQuestion() {
+                this.currentQuestionIndex++;
+                
+                if (this.currentQuestionIndex >= this.currentQuestions.length) {
+                    this.showResults();
+                } else {
+                    this.showQuestion();
+                }
+            }
+
+            showResults() {
+                document.getElementById('gameScreen').style.display = 'none';
+                document.getElementById('resultsScreen').style.display = 'block';
+                
+                const accuracy = (this.correctAnswers / this.currentQuestions.length) * 100;
+                
+                document.getElementById('finalScore').textContent = `${this.score} points`;
+                document.getElementById('finalCorrect').textContent = this.correctAnswers;
+                document.getElementById('finalIncorrect').textContent = this.incorrectAnswers;
+                document.getElementById('finalAccuracy').textContent = `${accuracy.toFixed(0)}%`;
+                
+                // Set emoji based on performance
+                const icon = accuracy >= 80 ? '🎉' : accuracy >= 60 ? '😊' : accuracy >= 40 ? '🙂' : '📚';
+                document.getElementById('resultsIcon').textContent = icon;
+            }
+
+            restartQuiz() {
+                this.startQuiz();
+            }
+
+            backToWelcome() {
+                this.currentTopic = null;
+                document.getElementById('welcomeScreen').style.display = 'block';
+                document.getElementById('gameScreen').style.display = 'none';
+                document.getElementById('resultsScreen').style.display = 'none';
+                this.renderTopics();
+            }
+        }
+
+        // Sidebar toggle functionality
+        function toggleSidebar() {
+            const container = document.getElementById('container');
+            const sidebar = document.getElementById('sidebar');
+            const expandBtn = document.getElementById('expandBtn');
+            
+            const isCollapsed = container.classList.contains('sidebar-collapsed');
+            
+            if (isCollapsed) {
+                container.classList.remove('sidebar-collapsed');
+                sidebar.classList.remove('collapsed');
+                expandBtn.classList.remove('visible');
+            } else {
+                container.classList.add('sidebar-collapsed');
+                sidebar.classList.add('collapsed');
+                expandBtn.classList.add('visible');
+            }
+        }
+
+        // Initialize the quiz game
+        let quiz;
+        
+        // Wait for DOM to be fully loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                quiz = new QuizGame();
+            });
+        } else {
+            quiz = new QuizGame();
+        }
+    </script>
+</body>
+</html>
