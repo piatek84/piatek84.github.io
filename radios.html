@@ -21,11 +21,25 @@
             --text-secondary: #b0b0b0;
             --accent: #404040;
             --border: #333333;
+            --page-grad-1: #0a0a0a;
+            --page-grad-2: #1a1a1a;
+        }
+
+        html[data-theme="light"] {
+            --bg-dark: #eef0f3;
+            --bg-medium: #ffffff;
+            --bg-light: #e6e8ec;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --accent: #d4d6db;
+            --border: #dcdee2;
+            --page-grad-1: #f2f3f5;
+            --page-grad-2: #e4e6ea;
         }
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            background: linear-gradient(135deg, var(--page-grad-1) 0%, var(--page-grad-2) 100%);
             color: var(--text-primary);
             min-height: 100vh;
             display: flex;
@@ -33,20 +47,16 @@
             align-items: center;
             padding: 20px;
             overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .container {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 40px;
-            max-width: 1400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 800px;
             width: 100%;
             animation: fadeIn 0.8s ease-out;
-            transition: grid-template-columns 0.3s ease;
-        }
-
-        .container.sidebar-collapsed {
-            grid-template-columns: 1fr 0px;
         }
 
         @keyframes fadeIn {
@@ -63,6 +73,12 @@
                         inset 0 1px 0 rgba(255, 255, 255, 0.05);
             position: relative;
             overflow: hidden;
+            height: auto;
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         /* DATETIME DISPLAY */
@@ -162,11 +178,11 @@
         }
 
         @keyframes scroll-text-continuous {
-            0% { 
-                transform: translateX(100%); 
+            0% {
+                transform: translateX(100%);
             }
-            100% { 
-                transform: translateX(-100%); 
+            100% {
+                transform: translateX(-100%);
             }
         }
 
@@ -282,30 +298,58 @@
             transition: all 0.2s ease;
         }
 
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--text-primary);
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s ease;
+        .volume-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.1);
         }
 
-        /* SIDEBAR */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 320px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .sidebar.collapsed {
-            width: 0;
+        /* SIDEBAR (POPUP) */
+        .overlay-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            z-index: 250;
             opacity: 0;
-            overflow: hidden;
             pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .overlay-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: start;
+            gap: 20px;
+            width: 90%;
+            max-width: 680px;
+            max-height: 85vh;
+            overflow-y: auto;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .sidebar.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        @media (max-width: 720px) {
+            .sidebar {
+                grid-template-columns: 1fr;
+                max-width: 380px;
+            }
         }
 
         .sidebar-toggle {
@@ -356,41 +400,37 @@
             transform: scale(1.05);
         }
 
+        .theme-toggle {
+            position: absolute;
+            right: 120px;
+            top: 20px;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-medium);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            z-index: 100;
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent);
+            transform: scale(1.05);
+        }
+
         body.fullscreen {
             padding: 0;
         }
 
         body.fullscreen .container {
-            max-width: 100%;
             height: 100vh;
             padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        body.fullscreen .container:not(.sidebar-collapsed) {
-            grid-template-columns: 1fr auto;
-            display: grid;
-            align-items: stretch;
-        }
-
-        body.fullscreen .container.sidebar-collapsed {
-            grid-template-columns: 1fr;
-            display: flex;
-        }
-
-        body.fullscreen .sidebar.collapsed {
-            display: none;
-        }
-
-        body.fullscreen .radio-player {
-            height: auto;
-            max-width: 800px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
 
         /* ADD STATION FORM */
@@ -629,7 +669,6 @@
             border-radius: 16px;
             padding: 24px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            margin-top: 20px;
             transition: all 0.3s ease;
         }
 
@@ -693,7 +732,7 @@
             border-radius: 16px;
             padding: 24px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            margin-top: 20px;
+            grid-column: 1 / -1;
             max-height: 300px;
             overflow-y: auto;
         }
@@ -803,15 +842,6 @@
 
         .mp3-playlist::-webkit-scrollbar-thumb:hover {
             background: var(--text-secondary);
-        }
-
-        .stations-list h3 {
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-            color: var(--text-secondary);
         }
 
         .station-item {
@@ -945,19 +975,6 @@
 
         /* RESPONSIVE */
         @media (max-width: 968px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                width: 100%;
-            }
-
-            .sidebar-toggle {
-                left: 0;
-                top: -50px;
-            }
-            
             .radio-player {
                 padding: 40px;
             }
@@ -1000,12 +1017,17 @@
     </style>
 </head>
 <body>
+    <script>
+        // Apply saved theme before paint to avoid a flash of the wrong theme
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('radioTheme') || 'dark');
+    </script>
     <div class="container">
         <!-- RADIO PLAYER -->
         <div class="radio-player">
             <button class="sidebar-toggle" id="sidebarToggle">✕</button>
             <button class="fullscreen-toggle" id="fullscreenToggle" title="Fullscreen">⛶</button>
-            
+            <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">🌙</button>
+
             <div class="datetime-display">
                 <div class="datetime-time" id="timeDisplay">00:00</div>
                 <div class="datetime-date" id="dateDisplay">01/01/2024</div>
@@ -1046,53 +1068,54 @@
             </div>
 
         </div>
+    </div>
 
-        <!-- SIDEBAR -->
-        <div class="sidebar" id="sidebar">
-            <!-- ADD STATION -->
-            <div class="add-station">
-                <h3>Add Station</h3>
-                <div class="input-group">
-                    <input type="text" class="input-field" id="stationTitle" placeholder="Station name">
-                </div>
-                <div class="input-group">
-                    <input type="text" class="input-field" id="stationUrl" placeholder="Stream URL">
-                </div>
-                <button class="btn" id="addBtn">Add</button>
+    <!-- MENU POPUP OVERLAY -->
+    <div class="overlay-backdrop" id="overlayBackdrop"></div>
+    <div class="sidebar" id="sidebar">
+        <!-- STATIONS LIST -->
+        <div class="stations-list" id="stationsListContainer">
+            <h3 id="stationsListHeader">
+                <span>My Stations</span>
+                <span class="collapse-icon">▼</span>
+            </h3>
+            <div class="stations-content">
+                <div id="stationsList"></div>
 
-                <div class="file-upload-section">
-                    <label for="mp3FileInput" class="file-upload-label">
-                        📁 Add MP3 to Playlist
-                    </label>
-                    <input type="file" id="mp3FileInput" accept="audio/mp3,audio/mpeg,audio/*" multiple>
-                    <div class="current-file" id="currentFile"></div>
-                </div>
-            </div>
-
-            <!-- STATIONS LIST -->
-            <div class="stations-list" id="stationsListContainer">
-                <h3 id="stationsListHeader">
-                    <span>My Stations</span>
-                    <span class="collapse-icon">▼</span>
-                </h3>
-                <div class="stations-content">
-                    <div id="stationsList"></div>
-                    
-                    <!-- IMPORT/EXPORT -->
-                    <div class="file-controls-inline">
-                        <button class="btn-secondary" id="exportBtn">Export CSV</button>
-                        <button class="btn-secondary" id="importBtn">Import CSV</button>
-                        <input type="file" id="fileInput" accept=".csv">
-                    </div>
+                <!-- IMPORT/EXPORT -->
+                <div class="file-controls-inline">
+                    <button class="btn-secondary" id="exportBtn">Export CSV</button>
+                    <button class="btn-secondary" id="importBtn">Import CSV</button>
+                    <input type="file" id="fileInput" accept=".csv">
                 </div>
             </div>
+        </div>
 
-            <!-- MP3 PLAYLIST -->
-            <div class="mp3-playlist" id="mp3Playlist" style="display: none;">
-                <h3>MP3 Playlist</h3>
-                <div id="mp3List"></div>
-                <button class="clear-playlist-btn" id="clearPlaylistBtn">Clear Playlist</button>
+        <!-- ADD STATION -->
+        <div class="add-station">
+            <h3>Add Station</h3>
+            <div class="input-group">
+                <input type="text" class="input-field" id="stationTitle" placeholder="Station name">
             </div>
+            <div class="input-group">
+                <input type="text" class="input-field" id="stationUrl" placeholder="Stream URL">
+            </div>
+            <button class="btn" id="addBtn">Add</button>
+
+            <div class="file-upload-section">
+                <label for="mp3FileInput" class="file-upload-label">
+                    📁 Add MP3 to Playlist
+                </label>
+                <input type="file" id="mp3FileInput" accept="audio/mp3,audio/mpeg,audio/*" multiple>
+                <div class="current-file" id="currentFile"></div>
+            </div>
+        </div>
+
+        <!-- MP3 PLAYLIST -->
+        <div class="mp3-playlist" id="mp3Playlist" style="display: none;">
+            <h3>MP3 Playlist</h3>
+            <div id="mp3List"></div>
+            <button class="clear-playlist-btn" id="clearPlaylistBtn">Clear Playlist</button>
         </div>
     </div>
 
@@ -1102,20 +1125,21 @@
                 this.audio = new Audio();
                 // Enable support for various audio formats
                 this.audio.preload = 'metadata';
-                
+
                 this.currentStation = null;
                 this.stations = this.loadStations();
                 this.isPlaying = false;
-                this.sidebarCollapsed = false;
+                this.sidebarCollapsed = true;
 
                 this.initElements();
                 this.initEventListeners();
                 this.renderStations();
                 this.updateDisplay();
                 this.startClock();
-                
-                // Set initial sidebar state
-                this.sidebarToggle.textContent = '✕';
+                this.updateThemeIcon();
+
+                // Set initial sidebar state (popup starts closed)
+                this.sidebarToggle.textContent = '☰';
             }
 
             initElements() {
@@ -1141,11 +1165,13 @@
                 this.clearPlaylistBtn = document.getElementById('clearPlaylistBtn');
                 this.sidebarToggle = document.getElementById('sidebarToggle');
                 this.fullscreenToggle = document.getElementById('fullscreenToggle');
+                this.themeToggle = document.getElementById('themeToggle');
                 this.sidebar = document.getElementById('sidebar');
+                this.overlayBackdrop = document.getElementById('overlayBackdrop');
                 this.container = document.querySelector('.container');
                 this.timeDisplay = document.getElementById('timeDisplay');
                 this.dateDisplay = document.getElementById('dateDisplay');
-                
+
                 // Progress bar elements
                 this.progressControl = document.getElementById('progressControl');
                 this.progressSlider = document.getElementById('progressSlider');
@@ -1157,7 +1183,7 @@
                 this.isSeeking = false;
                 this.isLocalFile = false;
                 this.currentLocalFile = null;
-                
+
                 // Playlist management
                 this.mp3Playlist = [];
                 this.currentPlaylistIndex = null;
@@ -1178,6 +1204,11 @@
                 this.stationsListHeader.addEventListener('click', () => this.toggleStationsList());
                 this.sidebarToggle.addEventListener('click', () => this.toggleSidebar());
                 this.fullscreenToggle.addEventListener('click', () => this.toggleFullscreen());
+                this.themeToggle.addEventListener('click', () => this.toggleTheme());
+                this.overlayBackdrop.addEventListener('click', () => this.closeSidebar());
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && !this.sidebarCollapsed) this.closeSidebar();
+                });
 
                 // Progress bar events
                 this.progressSlider.addEventListener('input', (e) => this.onProgressInput(e));
@@ -1208,45 +1239,66 @@
             startClock() {
                 const updateTime = () => {
                     const now = new Date();
-                    
+
                     // Format time as HH:MM
                     const hours = String(now.getHours()).padStart(2, '0');
                     const minutes = String(now.getMinutes()).padStart(2, '0');
                     this.timeDisplay.textContent = `${hours}:${minutes}`;
-                    
+
                     // Format date as DD/MM/YYYY
                     const day = String(now.getDate()).padStart(2, '0');
                     const month = String(now.getMonth() + 1).padStart(2, '0');
                     const year = now.getFullYear();
                     this.dateDisplay.textContent = `${day}/${month}/${year}`;
                 };
-                
+
                 updateTime();
                 setInterval(updateTime, 1000);
             }
 
             toggleSidebar() {
-                this.sidebarCollapsed = !this.sidebarCollapsed;
-                
                 if (this.sidebarCollapsed) {
-                    this.sidebar.classList.add('collapsed');
-                    this.container.classList.add('sidebar-collapsed');
-                    this.sidebarToggle.textContent = '☰';
+                    this.openSidebar();
                 } else {
-                    this.sidebar.classList.remove('collapsed');
-                    this.container.classList.remove('sidebar-collapsed');
-                    this.sidebarToggle.textContent = '✕';
+                    this.closeSidebar();
                 }
+            }
+
+            openSidebar() {
+                this.sidebarCollapsed = false;
+                this.sidebar.classList.add('open');
+                this.overlayBackdrop.classList.add('open');
+                this.sidebarToggle.textContent = '✕';
+            }
+
+            closeSidebar() {
+                this.sidebarCollapsed = true;
+                this.sidebar.classList.remove('open');
+                this.overlayBackdrop.classList.remove('open');
+                this.sidebarToggle.textContent = '☰';
             }
 
             toggleStationsList() {
                 this.stationsListContainer.classList.toggle('collapsed');
             }
 
+            toggleTheme() {
+                const current = document.documentElement.getAttribute('data-theme') || 'dark';
+                const next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('radioTheme', next);
+                this.updateThemeIcon();
+            }
+
+            updateThemeIcon() {
+                const current = document.documentElement.getAttribute('data-theme') || 'dark';
+                this.themeToggle.textContent = current === 'dark' ? '☀' : '🌙';
+            }
+
             toggleFullscreen() {
-                if (!document.fullscreenElement && 
-                    !document.webkitFullscreenElement && 
-                    !document.mozFullScreenElement && 
+                if (!document.fullscreenElement &&
+                    !document.webkitFullscreenElement &&
+                    !document.mozFullScreenElement &&
                     !document.msFullscreenElement) {
                     // Enter fullscreen
                     const elem = document.documentElement;
@@ -1259,7 +1311,7 @@
                     } else if (elem.msRequestFullscreen) {
                         elem.msRequestFullscreen();
                     }
-                    
+
                     // Auto-collapse sidebar when entering fullscreen
                     if (!this.sidebarCollapsed) {
                         this.toggleSidebar();
@@ -1279,9 +1331,9 @@
             }
 
             onFullscreenChange() {
-                if (document.fullscreenElement || 
-                    document.webkitFullscreenElement || 
-                    document.mozFullScreenElement || 
+                if (document.fullscreenElement ||
+                    document.webkitFullscreenElement ||
+                    document.mozFullScreenElement ||
                     document.msFullscreenElement) {
                     // Entered fullscreen
                     document.body.classList.add('fullscreen');
@@ -1304,14 +1356,14 @@
                     }
                     return;
                 }
-                
+
                 // Radio stations mode
                 if (this.stations.length === 0) return;
-                
-                const newIndex = this.currentStation === null || this.currentStation === 0 
-                    ? this.stations.length - 1 
+
+                const newIndex = this.currentStation === null || this.currentStation === 0
+                    ? this.stations.length - 1
                     : this.currentStation - 1;
-                
+
                 this.selectStation(newIndex, true);
             }
 
@@ -1324,14 +1376,14 @@
                     }
                     return;
                 }
-                
+
                 // Radio stations mode
                 if (this.stations.length === 0) return;
-                
+
                 const newIndex = this.currentStation === null || this.currentStation === this.stations.length - 1
                     ? 0
                     : this.currentStation + 1;
-                
+
                 this.selectStation(newIndex, true);
             }
 
@@ -1387,17 +1439,17 @@
             selectStation(index, autoPlay = false) {
                 const wasPlaying = this.isPlaying;
                 this.stop();
-                
+
                 // Clear local file mode and playlist
                 this.isLocalFile = false;
                 this.currentLocalFile = null;
                 this.currentPlaylistIndex = null;
                 this.currentFileDisplay.textContent = '';
                 this.progressControl.classList.remove('visible');
-                
+
                 // Expand stations list when playing radio
                 this.stationsListContainer.classList.remove('collapsed');
-                
+
                 this.currentStation = index;
                 this.audio.src = this.stations[index].url;
                 this.updateDisplay();
@@ -1487,7 +1539,7 @@
 
             renderPlaylist() {
                 this.mp3List.innerHTML = '';
-                
+
                 if (this.mp3Playlist.length === 0) {
                     this.mp3PlaylistContainer.style.display = 'none';
                     return;
@@ -1525,30 +1577,30 @@
                 if (index < 0 || index >= this.mp3Playlist.length) return;
 
                 const track = this.mp3Playlist[index];
-                
+
                 // Stop current playback
                 this.stop();
-                
+
                 // Set as local file
                 this.isLocalFile = true;
                 this.currentPlaylistIndex = index;
                 this.currentStation = null;
-                
+
                 // Load the file
                 this.audio.src = track.url;
-                
+
                 // Update display
                 this.displayText.textContent = track.name;
                 this.displayText.setAttribute('data-text', track.name);
                 this.currentFileDisplay.textContent = `Playing: ${track.name} (${index + 1}/${this.mp3Playlist.length})`;
-                
+
                 // Collapse stations list when playing MP3
                 this.stationsListContainer.classList.add('collapsed');
-                
+
                 // Update stations list to show no selection
                 this.renderStations();
                 this.renderPlaylist();
-                
+
                 // Start playing
                 this.play();
             }
@@ -1556,7 +1608,7 @@
             removeFromPlaylist(index) {
                 // Revoke object URL to free memory
                 URL.revokeObjectURL(this.mp3Playlist[index].url);
-                
+
                 // If removing currently playing track
                 if (index === this.currentPlaylistIndex) {
                     this.stop();
@@ -1565,18 +1617,18 @@
                     this.currentFileDisplay.textContent = '';
                     this.progressControl.classList.remove('visible');
                 }
-                
+
                 // Adjust current index if needed
                 if (this.currentPlaylistIndex !== null && index < this.currentPlaylistIndex) {
                     this.currentPlaylistIndex--;
                 }
-                
+
                 // Remove from playlist
                 this.mp3Playlist.splice(index, 1);
-                
+
                 // Re-render
                 this.renderPlaylist();
-                
+
                 if (this.mp3Playlist.length === 0) {
                     this.mp3PlaylistContainer.style.display = 'none';
                 }
@@ -1584,13 +1636,13 @@
 
             clearPlaylist() {
                 if (this.mp3Playlist.length === 0) return;
-                
+
                 if (confirm(`Clear all ${this.mp3Playlist.length} files from playlist?`)) {
                     // Revoke all object URLs
                     this.mp3Playlist.forEach(track => {
                         URL.revokeObjectURL(track.url);
                     });
-                    
+
                     // Stop if playing from playlist
                     if (this.isLocalFile) {
                         this.stop();
@@ -1598,7 +1650,7 @@
                         this.currentFileDisplay.textContent = '';
                         this.progressControl.classList.remove('visible');
                     }
-                    
+
                     // Clear playlist
                     this.mp3Playlist = [];
                     this.currentPlaylistIndex = null;
@@ -1649,7 +1701,7 @@
 
             onProgressInput(e) {
                 if (!this.isLocalFile || !isFinite(this.audio.duration)) return;
-                
+
                 const percentage = parseFloat(e.target.value);
                 const time = (percentage / 100) * this.audio.duration;
                 this.currentTimeDisplay.textContent = this.formatTime(time);
@@ -1658,7 +1710,7 @@
 
             onProgressChange(e) {
                 if (!this.isLocalFile || !isFinite(this.audio.duration)) return;
-                
+
                 const percentage = parseFloat(e.target.value);
                 const time = (percentage / 100) * this.audio.duration;
                 this.audio.currentTime = time;
@@ -1682,7 +1734,7 @@
             onError() {
                 const url = this.audio.src;
                 let errorMsg = 'Error loading stream.';
-                
+
                 if (url.includes('.m3u8')) {
                     errorMsg = 'HLS streams (.m3u8) may not be supported by your browser. Try using Chrome or Safari.';
                 } else if (url.includes('.aac')) {
@@ -1690,7 +1742,7 @@
                 } else if (url.includes('.pls') || url.includes('.m3u')) {
                     errorMsg = 'Playlist files (.pls, .m3u) are not supported. Use the direct stream URL instead.';
                 }
-                
+
                 alert(errorMsg + '\n\nURL: ' + url);
                 this.stop();
             }
@@ -1704,14 +1756,14 @@
                 } else {
                     displayText = 'Select a station';
                 }
-                
+
                 this.displayText.textContent = displayText;
                 this.displayText.setAttribute('data-text', displayText);
             }
 
             renderStations() {
                 this.stationsList.innerHTML = '';
-                
+
                 if (this.stations.length === 0) {
                     this.stationsList.innerHTML = '<p style="color: var(--text-secondary); font-size: 12px; text-align: center; padding: 20px;">No saved stations</p>';
                     return;
