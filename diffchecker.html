@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Compare & Diff Checker Online — Free, Fast, No Ads</title>
+<meta name="description" content="Free online text compare and diff checker. Paste two texts to instantly see line-by-line differences highlighted. No ads, no sign-up, minimalist and private.">
+<meta name="keywords" content="text compare, diff checker, compare two texts, text diff, online diff tool, compare text online, line diff">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Jan Korwer">
+<link rel="canonical" href="https://piatek84.github.io/diffchecker.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Text Compare & Diff Checker Online — Free, Fast, No Ads">
+<meta property="og:description" content="Free online text compare and diff checker. Paste two texts to instantly see line-by-line differences highlighted.">
+<meta property="og:url" content="https://piatek84.github.io/diffchecker.html">
+<meta property="og:site_name" content="Diff Checker">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Text Compare & Diff Checker Online — Free, Fast, No Ads">
+<meta name="twitter:description" content="Free online text compare and diff checker. Paste two texts to instantly see line-by-line differences highlighted.">
+
+<meta name="theme-color" content="#0f0f10">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Diff Checker",
+  "url": "https://piatek84.github.io/diffchecker.html",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Free online text compare and diff checker. Paste two texts to instantly see line-by-line differences highlighted."
+}
+</script>
+
+<style>
+  :root{
+    --bg:#0f0f10;
+    --panel:#1a1a1c;
+    --border:#2c2c2e;
+    --text:#e8e8ea;
+    --muted:#8a8a8e;
+    --accent:#e8e8ea;
+    --added-bg:rgba(63,185,80,.15);
+    --added-text:#3fb950;
+    --removed-bg:rgba(248,81,73,.15);
+    --removed-text:#f85149;
+  }
+  [data-theme="light"]{
+    --bg:#fafafa;
+    --panel:#ffffff;
+    --border:#e2e2e4;
+    --text:#1a1a1c;
+    --muted:#6b6b6f;
+    --accent:#1a1a1c;
+    --added-bg:rgba(31,136,61,.12);
+    --added-text:#1f883d;
+    --removed-bg:rgba(207,34,46,.12);
+    --removed-text:#cf222e;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:48px 20px 24px;
+    transition:background .2s,color .2s;
+  }
+  .top{
+    width:100%;
+    max-width:900px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:24px;
+  }
+  .top h1{
+    margin:0;
+    max-width:none;
+  }
+  .toggle{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--muted);
+    border-radius:8px;
+    width:36px;
+    height:36px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+  }
+  .toggle:hover{color:var(--text);border-color:var(--muted);}
+  h1{
+    width:100%;
+    max-width:900px;
+    margin:0 0 20px;
+    font-size:18px;
+    font-weight:600;
+    letter-spacing:.2px;
+  }
+  .subtitle{
+    width:100%;
+    max-width:900px;
+    margin:-10px 0 20px;
+    font-size:13px;
+    color:var(--muted);
+  }
+  main{
+    width:100%;
+    max-width:900px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .inputs{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .col{
+    flex:1 1 260px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .col label{
+    font-size:12px;
+    color:var(--muted);
+  }
+  textarea{
+    width:100%;
+    min-height:160px;
+    resize:vertical;
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:10px;
+    padding:14px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:14px;
+    line-height:1.5;
+    outline:none;
+  }
+  textarea:focus{border-color:var(--muted);}
+  textarea::placeholder{color:var(--muted);}
+  .buttons{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+  }
+  button.action{
+    background:var(--text);
+    color:var(--bg);
+    border:none;
+    border-radius:8px;
+    padding:10px 22px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  button.action:hover{opacity:.85;}
+  button.action.secondary{
+    background:none;
+    color:var(--text);
+    border:1px solid var(--border);
+  }
+  .stats{
+    font-size:12px;
+    color:var(--muted);
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  .stats .added{color:var(--added-text);}
+  .stats .removed{color:var(--removed-text);}
+  .output-wrap{
+    position:relative;
+  }
+  #diffOutput{
+    width:100%;
+    max-height:520px;
+    overflow:auto;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+  }
+  #diffOutput .placeholder{
+    display:block;
+    color:var(--muted);
+    padding:14px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:13px;
+  }
+  .diff-table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:13px;
+    line-height:1.6;
+  }
+  .diff-table th{
+    position:sticky;
+    top:0;
+    background:var(--panel);
+    text-align:left;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:12px;
+    font-weight:600;
+    color:var(--muted);
+    padding:10px 14px;
+    border-bottom:1px solid var(--border);
+  }
+  .diff-table td{
+    width:50%;
+    vertical-align:top;
+    padding:2px 14px;
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+  .diff-table td.left{
+    border-right:1px solid var(--border);
+  }
+  .diff-table td.removed{background:var(--removed-bg);color:var(--removed-text);}
+  .diff-table td.added{background:var(--added-bg);color:var(--added-text);}
+  .diff-table td.empty{background:var(--panel);}
+  .char-removed{
+    background:var(--removed-bg);
+    color:var(--removed-text);
+    border-radius:3px;
+    text-decoration:line-through;
+    text-decoration-thickness:1px;
+  }
+  .char-added{
+    background:var(--added-bg);
+    color:var(--added-text);
+    border-radius:3px;
+  }
+  .copyBtn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--muted);
+    border-radius:6px;
+    padding:5px 10px;
+    font-size:12px;
+    cursor:pointer;
+  }
+  .copyBtn:hover{color:var(--text);border-color:var(--muted);}
+  footer{
+    width:100%;
+    max-width:900px;
+    margin-top:40px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .kofi{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:8px 14px;
+    border-radius:999px;
+    color:var(--muted);
+    text-decoration:none;
+    border:1px solid var(--border);
+    font-size:13px;
+    font-weight:500;
+    transition:color .15s,border-color .15s;
+  }
+  .kofi:hover{color:var(--text);border-color:var(--muted);}
+  .kofi svg{width:16px;height:16px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Diff Checker</h1>
+  <button class="toggle" id="themeToggle" title="Toggle theme">🌙</button>
+</div>
+
+<p class="subtitle">Compare two texts and see line-by-line differences — free, fast, and private.</p>
+
+<main>
+  <div class="inputs">
+    <div class="col">
+      <label for="inputA">Version 1</label>
+      <textarea id="inputA" placeholder="Paste the original text here..."></textarea>
+    </div>
+    <div class="col">
+      <label for="inputB">Version 2</label>
+      <textarea id="inputB" placeholder="Paste the changed text here..."></textarea>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button class="action" id="compareBtn">Compare</button>
+    <span class="stats" id="stats"></span>
+  </div>
+
+  <div class="output-wrap">
+    <div id="diffOutput"><span class="placeholder">Differences will appear here...</span></div>
+    <button class="copyBtn" id="copyBtn">Copy</button>
+  </div>
+</main>
+
+<footer>
+  <a class="kofi" href="https://ko-fi.com/jankorwer" target="_blank" rel="noopener" title="Buy me a coffee">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="13.2" y1="2" x2="11.7" y2="6"/>
+      <rect x="5" y="6" width="14" height="3" rx="1.4"/>
+      <path d="M6 9 L7 20 Q7.2 21 8.2 21 L15.8 21 Q16.8 21 17 20 L18 9 Z"/>
+      <line x1="6.7" y1="14" x2="17.3" y2="14"/>
+    </svg>
+    Buy me a coffee
+  </a>
+</footer>
+
+<script>
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const saved = localStorage.getItem('theme') || 'dark';
+  applyTheme(saved);
+
+  themeToggle.addEventListener('click', () => {
+    const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const next = current === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+    localStorage.setItem('theme', next);
+  });
+
+  function applyTheme(theme){
+    if(theme === 'light'){
+      root.setAttribute('data-theme','light');
+      themeToggle.textContent = '☀️';
+    } else {
+      root.removeAttribute('data-theme');
+      themeToggle.textContent = '🌙';
+    }
+  }
+
+  const inputA = document.getElementById('inputA');
+  const inputB = document.getElementById('inputB');
+  const diffOutput = document.getElementById('diffOutput');
+  const statsEl = document.getElementById('stats');
+
+  function diffLines(a, b){
+    const linesA = a.split('\n');
+    const linesB = b.split('\n');
+    const n = linesA.length, m = linesB.length;
+    const dp = Array.from({length:n+1}, () => new Array(m+1).fill(0));
+    for(let i=n-1;i>=0;i--){
+      for(let j=m-1;j>=0;j--){
+        dp[i][j] = linesA[i] === linesB[j] ? dp[i+1][j+1] + 1 : Math.max(dp[i+1][j], dp[i][j+1]);
+      }
+    }
+    const result = [];
+    let i=0, j=0;
+    while(i<n && j<m){
+      if(linesA[i] === linesB[j]){
+        result.push({type:'same', text:linesA[i]});
+        i++; j++;
+      } else if(dp[i+1][j] >= dp[i][j+1]){
+        result.push({type:'removed', text:linesA[i]});
+        i++;
+      } else {
+        result.push({type:'added', text:linesB[j]});
+        j++;
+      }
+    }
+    while(i<n){ result.push({type:'removed', text:linesA[i]}); i++; }
+    while(j<m){ result.push({type:'added', text:linesB[j]}); j++; }
+    return result;
+  }
+
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // Character-level diff between two strings (used to highlight only the
+  // characters that changed within a modified line, not the whole line)
+  function diffChars(a, b){
+    const n = a.length, m = b.length;
+    const dp = Array.from({length:n+1}, () => new Array(m+1).fill(0));
+    for(let i=n-1;i>=0;i--){
+      for(let j=m-1;j>=0;j--){
+        dp[i][j] = a[i] === b[j] ? dp[i+1][j+1] + 1 : Math.max(dp[i+1][j], dp[i][j+1]);
+      }
+    }
+    const segs = [];
+    function push(type, ch){
+      const last = segs[segs.length-1];
+      if(last && last.type === type) last.text += ch;
+      else segs.push({type, text:ch});
+    }
+    let i=0, j=0;
+    while(i<n && j<m){
+      if(a[i] === b[j]){ push('same', a[i]); i++; j++; }
+      else if(dp[i+1][j] >= dp[i][j+1]){ push('removed', a[i]); i++; }
+      else { push('added', b[j]); j++; }
+    }
+    while(i<n){ push('removed', a[i]); i++; }
+    while(j<m){ push('added', b[j]); j++; }
+    return segs;
+  }
+
+  function renderModifiedSide(segs, side){
+    return segs
+      .filter(s => side === 'left' ? s.type !== 'added' : s.type !== 'removed')
+      .map(s => {
+        const text = escapeHtml(s.text);
+        if(s.type === 'same') return text;
+        const cls = side === 'left' ? 'char-removed' : 'char-added';
+        return `<mark class="${cls}">${text}</mark>`;
+      })
+      .join('');
+  }
+
+  // Pair up consecutive removed/added blocks into aligned side-by-side rows
+  function buildRows(a, b){
+    const flat = diffLines(a, b);
+    const rows = [];
+    let i = 0;
+    while(i < flat.length){
+      if(flat[i].type === 'same'){
+        rows.push({type:'same', left:flat[i].text, right:flat[i].text});
+        i++;
+        continue;
+      }
+      const removedBuf = [];
+      const addedBuf = [];
+      while(i < flat.length && flat[i].type !== 'same'){
+        if(flat[i].type === 'removed') removedBuf.push(flat[i].text);
+        else addedBuf.push(flat[i].text);
+        i++;
+      }
+      const max = Math.max(removedBuf.length, addedBuf.length);
+      for(let k=0;k<max;k++){
+        const left = k < removedBuf.length ? removedBuf[k] : null;
+        const right = k < addedBuf.length ? addedBuf[k] : null;
+        const type = (left !== null && right !== null) ? 'modified' : (left !== null ? 'removed' : 'added');
+        rows.push({type, left, right});
+      }
+    }
+    return rows;
+  }
+
+  document.getElementById('compareBtn').addEventListener('click', () => {
+    if(inputA.value === '' && inputB.value === ''){
+      diffOutput.innerHTML = '<span class="placeholder">Differences will appear here...</span>';
+      statsEl.innerHTML = '';
+      return;
+    }
+
+    const rows = buildRows(inputA.value, inputB.value);
+    let added = 0, removed = 0;
+
+    const body = rows.map(row => {
+      let leftCls = 'left', rightCls = 'right';
+      let leftText, rightText;
+
+      if(row.type === 'removed'){
+        leftCls += ' removed'; rightCls += ' empty'; removed++;
+        leftText = escapeHtml(row.left) || '&nbsp;';
+        rightText = '';
+      } else if(row.type === 'added'){
+        leftCls += ' empty'; rightCls += ' added'; added++;
+        leftText = '';
+        rightText = escapeHtml(row.right) || '&nbsp;';
+      } else if(row.type === 'modified'){
+        removed++; added++;
+        const segs = diffChars(row.left, row.right);
+        leftText = renderModifiedSide(segs, 'left') || '&nbsp;';
+        rightText = renderModifiedSide(segs, 'right') || '&nbsp;';
+      } else {
+        leftText = escapeHtml(row.left) || '&nbsp;';
+        rightText = escapeHtml(row.right) || '&nbsp;';
+      }
+
+      return `<tr data-type="${row.type}"><td class="${leftCls}">${leftText}</td><td class="${rightCls}">${rightText}</td></tr>`;
+    }).join('');
+
+    diffOutput.innerHTML = `<table class="diff-table"><thead><tr><th>Version 1</th><th>Version 2</th></tr></thead><tbody>${body}</tbody></table>`;
+    statsEl.innerHTML = `<span class="added">+${added}</span> <span class="removed">−${removed}</span>`;
+  });
+
+  const copyBtn = document.getElementById('copyBtn');
+  copyBtn.addEventListener('click', async () => {
+    const rows = diffOutput.querySelectorAll('tbody tr');
+    if(!rows.length) return;
+    let text = '';
+    rows.forEach(row => {
+      const type = row.dataset.type;
+      const left = row.children[0];
+      const right = row.children[1];
+      if(type === 'removed') text += '- ' + left.textContent + '\n';
+      else if(type === 'added') text += '+ ' + right.textContent + '\n';
+      else if(type === 'modified'){ text += '- ' + left.textContent + '\n' + '+ ' + right.textContent + '\n'; }
+      else text += '  ' + left.textContent + '\n';
+    });
+    try {
+      await navigator.clipboard.writeText(text);
+      const original = copyBtn.textContent;
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => copyBtn.textContent = original, 1200);
+    } catch(e) {
+      console.error(e);
+    }
+  });
+</script>
+
+</body>
+</html>
