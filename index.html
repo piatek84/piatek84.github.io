@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tools — Jan Korwer</title>
+<meta name="description" content="A small collection of free, minimalist, no-ads online tools: Base64 encoder/decoder, JSON beautifier, diff checker, and more.">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Jan Korwer">
+<link rel="canonical" href="https://piatek84.github.io/index.html">
+<meta name="theme-color" content="#0f0f10">
+
+<style>
+  :root{
+    --bg:#0f0f10;
+    --panel:#1a1a1c;
+    --border:#2c2c2e;
+    --text:#e8e8ea;
+    --muted:#8a8a8e;
+  }
+  [data-theme="light"]{
+    --bg:#fafafa;
+    --panel:#ffffff;
+    --border:#e2e2e4;
+    --text:#1a1a1c;
+    --muted:#6b6b6f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:48px 20px 24px;
+    transition:background .2s,color .2s;
+  }
+  .top{
+    width:100%;
+    max-width:520px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:24px;
+  }
+  h1{
+    margin:0;
+    font-size:18px;
+    font-weight:600;
+    letter-spacing:.2px;
+  }
+  .toggle{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--muted);
+    border-radius:8px;
+    width:36px;
+    height:36px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+  }
+  .toggle:hover{color:var(--text);border-color:var(--muted);}
+  main{
+    width:100%;
+    max-width:520px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  a.link-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:14px 16px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    color:var(--text);
+    text-decoration:none;
+    font-size:14px;
+    font-weight:500;
+    transition:border-color .15s,transform .1s;
+  }
+  a.link-row:hover{
+    border-color:var(--muted);
+  }
+  a.link-row svg.file-icon{
+    width:16px;
+    height:16px;
+    flex-shrink:0;
+    color:var(--muted);
+  }
+  a.link-row .arrow{
+    margin-left:auto;
+    color:var(--muted);
+    font-size:14px;
+  }
+  footer{
+    width:100%;
+    max-width:520px;
+    margin-top:40px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .kofi{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:8px 14px;
+    border-radius:999px;
+    color:var(--muted);
+    text-decoration:none;
+    border:1px solid var(--border);
+    font-size:13px;
+    font-weight:500;
+    transition:color .15s,border-color .15s;
+  }
+  .kofi:hover{color:var(--text);border-color:var(--muted);}
+  .kofi svg{width:16px;height:16px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Tools</h1>
+  <button class="toggle" id="themeToggle" title="Toggle theme">🌙</button>
+</div>
+
+<main>
+  <a class="link-row" href="base64.html">
+    <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    Base64 Encoder/Decoder
+    <span class="arrow">→</span>
+  </a>
+  <a class="link-row" href="diffchecker.html">
+    <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    Diff Checker
+    <span class="arrow">→</span>
+  </a>
+  <a class="link-row" href="jsonbeautifier.html">
+    <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    JSON Beautifier
+    <span class="arrow">→</span>
+  </a>
+  <a class="link-row" href="language-quiz.html">
+    <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    Language Quiz
+    <span class="arrow">→</span>
+  </a>
+  <a class="link-row" href="productivity_hub.html">
+    <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    Productivity Hub
+    <span class="arrow">→</span>
+  </a>
+  <a class="link-row" href="prompt_manager.html">
+    <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    Prompt Manager
+    <span class="arrow">→</span>
+  </a>
+  <a class="link-row" href="radios.html">
+    <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    Radios
+    <span class="arrow">→</span>
+  </a>
+</main>
+
+<footer>
+  <a class="kofi" href="https://ko-fi.com/jankorwer" target="_blank" rel="noopener" title="Buy me a coffee">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="13.2" y1="2" x2="11.7" y2="6"/>
+      <rect x="5" y="6" width="14" height="3" rx="1.4"/>
+      <path d="M6 9 L7 20 Q7.2 21 8.2 21 L15.8 21 Q16.8 21 17 20 L18 9 Z"/>
+      <line x1="6.7" y1="14" x2="17.3" y2="14"/>
+    </svg>
+    Buy me a coffee
+  </a>
+</footer>
+
+<script>
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const saved = localStorage.getItem('theme') || 'dark';
+  applyTheme(saved);
+
+  themeToggle.addEventListener('click', () => {
+    const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const next = current === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+    localStorage.setItem('theme', next);
+  });
+
+  function applyTheme(theme){
+    if(theme === 'light'){
+      root.setAttribute('data-theme','light');
+      themeToggle.textContent = '☀️';
+    } else {
+      root.removeAttribute('data-theme');
+      themeToggle.textContent = '🌙';
+    }
+  }
+</script>
+
+</body>
+</html>
