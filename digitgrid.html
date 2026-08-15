@@ -142,6 +142,29 @@
     border-radius:10px;
     padding:24px;
   }
+  .difficulty{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin-bottom:20px;
+  }
+  .diff-btn{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--muted);
+    border-radius:999px;
+    padding:7px 16px;
+    font-size:13px;
+    font-weight:500;
+    cursor:pointer;
+    transition:color .15s,border-color .15s,background .15s;
+  }
+  .diff-btn:hover{color:var(--text);border-color:var(--muted);}
+  .diff-btn.active{
+    background:var(--text);
+    color:var(--bg);
+    border-color:var(--text);
+  }
   .meta-row{
     display:flex;
     justify-content:space-between;
@@ -255,11 +278,6 @@
     cursor:pointer;
   }
   button.action:hover{opacity:.85;}
-  button.action.secondary{
-    background:none;
-    color:var(--text);
-    border:1px solid var(--border);
-  }
 
   footer{
     width:100%;
@@ -299,6 +317,12 @@
 
 <main>
   <div class="panel">
+    <div class="difficulty" id="difficulty">
+      <button class="diff-btn" data-level="easy">Easy</button>
+      <button class="diff-btn" data-level="medium">Medium</button>
+      <button class="diff-btn" data-level="hard">Hard</button>
+    </div>
+
     <div class="meta-row">
       <span class="badge" id="cluesBadge">Clues: 0</span>
       <span class="stats"><span class="added" id="solvedCount">Solved: 0</span></span>
@@ -312,7 +336,6 @@
 
     <div class="buttons">
       <button class="action" id="newGameBtn">New Puzzle</button>
-      <button class="action secondary" id="checkBtn">Check Board</button>
     </div>
   </div>
 </main>
@@ -472,17 +495,32 @@
 
   // ---------------- Game state & rendering ----------------
 
-  const CLUE_COUNT = 34; // medium difficulty
+  const CLUE_COUNTS = { easy: 40, medium: 34, hard: 26 };
 
   let solution = [];
   let puzzle = [];
   let solvedCount = parseInt(localStorage.getItem('sudoku_solved') || '0', 10);
   let alreadyWon = false;
+  let difficulty = localStorage.getItem('sudoku_difficulty') || 'medium';
+  if(!CLUE_COUNTS[difficulty]) difficulty = 'medium';
 
   const gridEl = document.getElementById('grid');
   const messageEl = document.getElementById('message');
   const cluesBadge = document.getElementById('cluesBadge');
   const solvedCountEl = document.getElementById('solvedCount');
+  const diffButtons = document.querySelectorAll('.diff-btn');
+
+  function setDifficulty(level){
+    difficulty = level;
+    localStorage.setItem('sudoku_difficulty', level);
+    diffButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.level === level));
+    buildBoard();
+  }
+
+  diffButtons.forEach(btn => {
+    btn.addEventListener('click', () => setDifficulty(btn.dataset.level));
+  });
+  diffButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.level === difficulty));
 
   function setMessage(text, type){
     messageEl.textContent = text;
@@ -495,7 +533,7 @@
 
   function buildBoard(){
     solution = generateSolution();
-    puzzle = makePuzzle(solution, CLUE_COUNT);
+    puzzle = makePuzzle(solution, CLUE_COUNTS[difficulty]);
     alreadyWon = false;
 
     gridEl.innerHTML = '';
@@ -661,39 +699,6 @@
       document.activeElement.blur();
     }
     buildBoard();
-  });
-
-  document.getElementById('checkBtn').addEventListener('click', () => {
-    if(document.activeElement && document.activeElement.blur){
-      document.activeElement.blur();
-    }
-    let wrongCount = 0;
-    gridEl.querySelectorAll('.cell').forEach(cell => {
-      if(cell.classList.contains('given') || cell.readOnly) return;
-      const row = parseInt(cell.dataset.row, 10);
-      const col = parseInt(cell.dataset.col, 10);
-      const val = cell.value;
-      cell.classList.remove('correct', 'wrong');
-      if(val === ''){
-        return;
-      }
-      if(parseInt(val, 10) === solution[row][col]){
-        cell.classList.add('correct');
-        cell.readOnly = true;
-        clearCandidates(cell);
-      } else {
-        cell.classList.add('wrong');
-        wrongCount++;
-      }
-    });
-    if(wrongCount === 0){
-      checkForWin();
-      if(!alreadyWon){
-        setMessage('Looks good so far — keep going.');
-      }
-    } else {
-      setMessage(wrongCount + ' cell(s) need another look.');
-    }
   });
 
   renderStats();
