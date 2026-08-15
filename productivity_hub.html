@@ -3,7 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Productivity Hub</title>
+    <title>Productivity Hub — All-in-One Dashboard, No Ads</title>
+    <meta name="description" content="Free all-in-one productivity dashboard with a clock, calendar, sticky notes, a mini radio player, and a prompt manager — all in one browser tab. No ads, no sign-up, minimalist and private.">
+    <meta name="keywords" content="productivity dashboard, all in one dashboard, new tab dashboard, clock widget, calendar widget, sticky notes app, productivity tools">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Jan Korwer">
+    <link rel="canonical" href="https://piatek84.github.io/productivity_hub.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Productivity Hub — All-in-One Dashboard, No Ads">
+    <meta property="og:description" content="Free all-in-one productivity dashboard with a clock, calendar, sticky notes, a mini radio player, and a prompt manager — all in one browser tab.">
+    <meta property="og:url" content="https://piatek84.github.io/productivity_hub.html">
+    <meta property="og:site_name" content="Productivity Hub">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Productivity Hub — All-in-One Dashboard, No Ads">
+    <meta name="twitter:description" content="Free all-in-one productivity dashboard with a clock, calendar, sticky notes, a mini radio player, and a prompt manager — all in one browser tab.">
+
+    <meta name="theme-color" content="#0f0f10">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Productivity Hub",
+      "url": "https://piatek84.github.io/productivity_hub.html",
+      "applicationCategory": "ProductivityApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Free all-in-one productivity dashboard with a clock, calendar, sticky notes, a mini radio player, and a prompt manager — all in one browser tab."
+    }
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -1422,7 +1459,10 @@
         const FullscreenModule = {
             init() {
                 document.getElementById('fullscreenBtn').addEventListener('click', () => this.toggle());
-                
+
+                // Double-click anywhere to toggle fullscreen too (double-click again to exit).
+                document.addEventListener('dblclick', () => this.toggle());
+
                 // Listen for fullscreen changes
                 document.addEventListener('fullscreenchange', () => this.updateIcon());
                 document.addEventListener('webkitfullscreenchange', () => this.updateIcon());

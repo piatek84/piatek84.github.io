@@ -3,7 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Language Quiz Game</title>
+    <title>Language Quiz — Free Vocabulary Flashcard Quiz, No Ads</title>
+    <meta name="description" content="Free online language quiz. Import your own word pairs from a CSV file and test your vocabulary with instant multiple-choice quizzes. No ads, no sign-up, minimalist and private.">
+    <meta name="keywords" content="language quiz, vocabulary quiz, flashcard app, learn vocabulary online, csv quiz maker, language learning game, free quiz app">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Jan Korwer">
+    <link rel="canonical" href="https://piatek84.github.io/language-quiz.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Language Quiz — Free Vocabulary Flashcard Quiz, No Ads">
+    <meta property="og:description" content="Free online language quiz. Import your own word pairs from a CSV file and test your vocabulary with instant multiple-choice quizzes.">
+    <meta property="og:url" content="https://piatek84.github.io/language-quiz.html">
+    <meta property="og:site_name" content="Language Quiz">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Language Quiz — Free Vocabulary Flashcard Quiz, No Ads">
+    <meta name="twitter:description" content="Free online language quiz. Import your own word pairs from a CSV file and test your vocabulary with instant multiple-choice quizzes.">
+
+    <meta name="theme-color" content="#0f0f10">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Language Quiz",
+      "url": "https://piatek84.github.io/language-quiz.html",
+      "applicationCategory": "EducationApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Free online language quiz. Import your own word pairs from a CSV file and test your vocabulary with instant multiple-choice quizzes."
+    }
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -1317,6 +1354,23 @@
         } else {
             quiz = new QuizGame();
         }
+
+        // Double-click anywhere to toggle fullscreen (double-click again to exit).
+        document.addEventListener('dblclick', () => {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement &&
+                !document.mozFullScreenElement && !document.msFullscreenElement) {
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) elem.requestFullscreen();
+                else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+                else if (elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+                else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+                else if (document.msExitFullscreen) document.msExitFullscreen();
+            }
+        });
     </script>
 </body>
 </html>

@@ -3,12 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tools — Jan Korwer</title>
-<meta name="description" content="A small collection of free, minimalist, no-ads online tools: Base64 encoder/decoder, JSON beautifier, diff checker, and more.">
+<title>Free Online Tools — Jan Korwer</title>
+<meta name="description" content="A free collection of minimalist, no-ads online tools: Base64 encoder/decoder, JSON beautifier, diff checker, language quiz, Pomodoro timer, online radio, and Digit Grid sudoku.">
+<meta name="keywords" content="online tools, free web tools, base64 encoder, json beautifier, diff checker, pomodoro timer, online radio, sudoku, language quiz">
 <meta name="robots" content="index, follow">
 <meta name="author" content="Jan Korwer">
 <link rel="canonical" href="https://piatek84.github.io/index.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free Online Tools — Jan Korwer">
+<meta property="og:description" content="A free collection of minimalist, no-ads online tools: Base64 encoder/decoder, JSON beautifier, diff checker, language quiz, Pomodoro timer, online radio, and Digit Grid sudoku.">
+<meta property="og:url" content="https://piatek84.github.io/index.html">
+<meta property="og:site_name" content="Tools">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Free Online Tools — Jan Korwer">
+<meta name="twitter:description" content="A free collection of minimalist, no-ads online tools: Base64 encoder/decoder, JSON beautifier, diff checker, language quiz, Pomodoro timer, online radio, and Digit Grid sudoku.">
+
 <meta name="theme-color" content="#0f0f10">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Free Online Tools",
+  "url": "https://piatek84.github.io/index.html",
+  "description": "A free collection of minimalist, no-ads online tools: Base64 encoder/decoder, JSON beautifier, diff checker, language quiz, Pomodoro timer, online radio, and Digit Grid sudoku.",
+  "hasPart": [
+    { "@type": "WebApplication", "name": "Base64 Encoder/Decoder", "url": "https://piatek84.github.io/base64.html" },
+    { "@type": "WebApplication", "name": "Diff Checker", "url": "https://piatek84.github.io/diffchecker.html" },
+    { "@type": "WebApplication", "name": "JSON Beautifier", "url": "https://piatek84.github.io/jsonbeautifier.html" },
+    { "@type": "WebApplication", "name": "Language Quiz", "url": "https://piatek84.github.io/language-quiz.html" },
+    { "@type": "WebApplication", "name": "Pomodoro Timer", "url": "https://piatek84.github.io/pomodoro.html" },
+    { "@type": "WebApplication", "name": "Retro Radio", "url": "https://piatek84.github.io/radios.html" },
+    { "@type": "WebApplication", "name": "Digit Grid", "url": "https://piatek84.github.io/digitgrid.html" }
+  ]
+}
+</script>
 
 <style>
   :root{
@@ -204,6 +237,25 @@
       themeToggle.textContent = '🌙';
     }
   }
+</script>
+
+<script>
+  // Double-click anywhere to toggle fullscreen (double-click again to exit).
+  document.addEventListener('dblclick', () => {
+    if(!document.fullscreenElement && !document.webkitFullscreenElement &&
+       !document.mozFullScreenElement && !document.msFullscreenElement){
+      const elem = document.documentElement;
+      if(elem.requestFullscreen) elem.requestFullscreen();
+      else if(elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      else if(elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+      else if(elem.msRequestFullscreen) elem.msRequestFullscreen();
+    } else {
+      if(document.exitFullscreen) document.exitFullscreen();
+      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if(document.mozCancelFullScreen) document.mozCancelFullScreen();
+      else if(document.msExitFullscreen) document.msExitFullscreen();
+    }
+  });
 </script>
 
 </body>

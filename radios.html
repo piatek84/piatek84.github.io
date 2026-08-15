@@ -3,7 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retro Radio</title>
+    <title>Retro Radio — Free Online Radio Player, No Ads</title>
+    <meta name="description" content="Free online radio player. Listen to internet radio stations or your own MP3 playlist, right in your browser. No ads, no sign-up, minimalist and private.">
+    <meta name="keywords" content="online radio, internet radio player, free radio player, listen to radio online, web radio player, mp3 player, radio streaming">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Jan Korwer">
+    <link rel="canonical" href="https://piatek84.github.io/radios.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Retro Radio — Free Online Radio Player, No Ads">
+    <meta property="og:description" content="Free online radio player. Listen to internet radio stations or your own MP3 playlist, right in your browser.">
+    <meta property="og:url" content="https://piatek84.github.io/radios.html">
+    <meta property="og:site_name" content="Retro Radio">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Retro Radio — Free Online Radio Player, No Ads">
+    <meta name="twitter:description" content="Free online radio player. Listen to internet radio stations or your own MP3 playlist, right in your browser.">
+
+    <meta name="theme-color" content="#0f0f10">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Retro Radio",
+      "url": "https://piatek84.github.io/radios.html",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Free online radio player. Listen to internet radio stations or your own MP3 playlist, right in your browser."
+    }
+    </script>
+
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8dGV4dCB4PSI1MCUiIHk9IjcwJSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI3MiI+8J+TuzwvdGV4dD4KPC9zdmc+">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -142,7 +179,9 @@
         }
 
         .radio-header {
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-bottom: 40px;
         }
 
@@ -152,11 +191,10 @@
             letter-spacing: 4px;
             text-transform: uppercase;
             color: var(--muted);
-            margin-bottom: 8px;
         }
 
         .radio-model {
-            font-size: 32px;
+            font-size: 26px;
             font-weight: 700;
             letter-spacing: -1px;
         }
@@ -227,32 +265,38 @@
 
         /* CONTROLS */
         .controls {
-            display: flex;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            align-items: center;
             gap: 16px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .controls-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .control-btn {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: var(--surface);
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            background: var(--panel);
             border: 2px solid var(--border);
+            border-radius: 10px;
             color: var(--text);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-            font-size: 24px;
         }
 
-        .control-btn.small {
-            width: 48px;
-            height: 48px;
-            font-size: 18px;
+        .control-btn svg {
+            width: 18px;
+            height: 18px;
         }
 
         .control-btn:disabled {
@@ -263,38 +307,32 @@
         .control-btn:not(:disabled):hover {
             background: var(--surface-hover);
             transform: scale(1.05);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         }
 
         .control-btn:active {
             transform: scale(0.95);
         }
 
-        .control-btn.playing {
-            background: var(--text);
-            color: var(--bg);
-        }
-
         /* VOLUME CONTROL */
         .volume-control {
-            margin-top: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            color: var(--muted);
         }
 
-        .volume-label {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 16px;
-            display: block;
+        .volume-control svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
         }
 
         .volume-slider {
-            width: 100%;
-            height: 6px;
+            flex: 1;
+            height: 3px;
             border-radius: 3px;
-            background: var(--surface);
+            background: var(--border);
             outline: none;
             -webkit-appearance: none;
             position: relative;
@@ -303,8 +341,8 @@
         .volume-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 13px;
+            height: 13px;
             border-radius: 50%;
             background: var(--text);
             cursor: pointer;
@@ -313,12 +351,11 @@
 
         .volume-slider::-webkit-slider-thumb:hover {
             transform: scale(1.2);
-            box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.1);
         }
 
         .volume-slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
+            width: 13px;
+            height: 13px;
             border-radius: 50%;
             background: var(--text);
             cursor: pointer;
@@ -328,7 +365,6 @@
 
         .volume-slider::-moz-range-thumb:hover {
             transform: scale(1.2);
-            box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.1);
         }
 
         /* SIDEBAR (POPUP) */
@@ -421,6 +457,32 @@
         .icon-btn:hover {
             background: var(--surface-hover);
             transform: scale(1.05);
+        }
+
+        /* TOAST — replaces alert() with a small, non-blocking notice. */
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            max-width: 320px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.4;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 2000;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         body.fullscreen {
@@ -989,12 +1051,6 @@
             }
 
             .radio-model {
-                font-size: 24px;
-            }
-
-            .control-btn {
-                width: 56px;
-                height: 56px;
                 font-size: 20px;
             }
         }
@@ -1013,6 +1069,12 @@
             .datetime-display {
                 order: 3;
                 width: 100%;
+            }
+
+            /* 60/40 columns get too tight for 4 buttons + a slider at
+               phone widths — stack buttons above the volume row instead. */
+            .controls {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -1056,14 +1118,12 @@
                 </div>
                 <div class="topbar-actions">
                     <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
-                    <button class="icon-btn" id="fullscreenToggle" title="Fullscreen">⛶</button>
                     <button class="icon-btn" id="sidebarToggle" title="Menu">☰</button>
                 </div>
             </div>
 
             <div class="radio-header">
-                <div class="radio-title">Minimal</div>
-                <div class="radio-model">RETRO RADIO</div>
+                <span class="radio-title">mini</span><span class="radio-model">RADIO</span>
             </div>
 
             <div class="display">
@@ -1071,15 +1131,28 @@
             </div>
 
             <div class="controls">
-                <button class="control-btn small" id="prevBtn" title="Previous">⏮</button>
-                <button class="control-btn" id="playBtn" title="Play/Pause">▶</button>
-                <button class="control-btn" id="stopBtn" title="Stop">■</button>
-                <button class="control-btn small" id="nextBtn" title="Next">⏭</button>
-            </div>
+                <div class="controls-buttons">
+                    <button class="control-btn" id="prevBtn" title="Previous">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+                    </button>
+                    <button class="control-btn" id="playBtn" title="Play/Pause">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5v14l12-7z"/></svg>
+                    </button>
+                    <button class="control-btn" id="stopBtn" title="Stop">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+                    </button>
+                    <button class="control-btn" id="nextBtn" title="Next">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                    </button>
+                </div>
 
-            <div class="volume-control">
-                <label class="volume-label">Volume</label>
-                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="30">
+                <div class="volume-control">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9v6h4l5 5V4L7 9H3z"/>
+                        <path d="M16 8a5 5 0 0 1 0 8"/>
+                    </svg>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="30" aria-label="Volume">
+                </div>
             </div>
 
             <div class="progress-control" id="progressControl">
@@ -1160,6 +1233,26 @@
     </div>
 
     <script>
+        const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5v14l12-7z"/></svg>';
+        const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
+
+        let toastEl = null;
+        let toastTimer = null;
+
+        function showToast(message) {
+            if (!toastEl) {
+                toastEl = document.createElement('div');
+                toastEl.className = 'toast';
+                document.body.appendChild(toastEl);
+            }
+            toastEl.textContent = message;
+            toastEl.classList.remove('visible');
+            void toastEl.offsetWidth; // restart the transition if it's already showing
+            toastEl.classList.add('visible');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toastEl.classList.remove('visible'), 2000);
+        }
+
         class RadioPlayer {
             constructor() {
                 this.audio = new Audio();
@@ -1204,7 +1297,6 @@
                 this.mp3List = document.getElementById('mp3List');
                 this.clearPlaylistBtn = document.getElementById('clearPlaylistBtn');
                 this.sidebarToggle = document.getElementById('sidebarToggle');
-                this.fullscreenToggle = document.getElementById('fullscreenToggle');
                 this.themeToggle = document.getElementById('themeToggle');
                 this.sidebar = document.getElementById('sidebar');
                 this.overlayBackdrop = document.getElementById('overlayBackdrop');
@@ -1243,9 +1335,9 @@
                 this.clearPlaylistBtn.addEventListener('click', () => this.clearPlaylist());
                 this.stationsListHeader.addEventListener('click', () => this.toggleStationsList());
                 this.sidebarToggle.addEventListener('click', () => this.toggleSidebar());
-                this.fullscreenToggle.addEventListener('click', () => this.toggleFullscreen());
                 this.themeToggle.addEventListener('click', () => this.toggleTheme());
                 this.overlayBackdrop.addEventListener('click', () => this.closeSidebar());
+                document.addEventListener('dblclick', () => this.toggleFullscreen());
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape' && !this.sidebarCollapsed) this.closeSidebar();
                 });
@@ -1381,15 +1473,9 @@
                     document.webkitFullscreenElement ||
                     document.mozFullScreenElement ||
                     document.msFullscreenElement) {
-                    // Entered fullscreen
                     document.body.classList.add('fullscreen');
-                    this.fullscreenToggle.textContent = '⛶';
-                    this.fullscreenToggle.title = 'Exit Fullscreen';
                 } else {
-                    // Exited fullscreen
                     document.body.classList.remove('fullscreen');
-                    this.fullscreenToggle.textContent = '⛶';
-                    this.fullscreenToggle.title = 'Fullscreen';
                 }
             }
 
@@ -1452,7 +1538,7 @@
                 const url = this.stationUrl.value.trim();
 
                 if (!title || !url) {
-                    alert('Please fill in all fields');
+                    showToast('📻 Give it a name and a stream URL first');
                     return;
                 }
 
@@ -1512,7 +1598,7 @@
                     if (this.stations.length > 0) {
                         this.selectStation(0, true);
                     } else {
-                        alert('Add a station first');
+                        showToast('📻 Add a station before you hit play');
                     }
                     return;
                 }
@@ -1527,7 +1613,7 @@
             play() {
                 this.audio.play().catch(err => {
                     console.error('Playback error:', err);
-                    alert('Error playing stream');
+                    showToast("⚠️ Couldn't tune into that station");
                 });
             }
 
@@ -1539,8 +1625,7 @@
                 this.audio.pause();
                 this.audio.currentTime = 0;
                 this.isPlaying = false;
-                this.playBtn.innerHTML = '▶';
-                this.playBtn.classList.remove('playing');
+                this.playBtn.innerHTML = ICON_PLAY;
                 this.displayText.classList.add('paused');
             }
 
@@ -1765,31 +1850,29 @@
 
             onPlay() {
                 this.isPlaying = true;
-                this.playBtn.innerHTML = '❚❚';
-                this.playBtn.classList.add('playing');
+                this.playBtn.innerHTML = ICON_PAUSE;
                 this.displayText.classList.remove('paused');
             }
 
             onPause() {
                 this.isPlaying = false;
-                this.playBtn.innerHTML = '▶';
-                this.playBtn.classList.remove('playing');
+                this.playBtn.innerHTML = ICON_PLAY;
                 this.displayText.classList.add('paused');
             }
 
             onError() {
                 const url = this.audio.src;
-                let errorMsg = 'Error loading stream.';
+                let errorMsg = "⚠️ Couldn't load that stream";
 
                 if (url.includes('.m3u8')) {
-                    errorMsg = 'HLS streams (.m3u8) may not be supported by your browser. Try using Chrome or Safari.';
+                    errorMsg = '⚠️ HLS streams (.m3u8) need Chrome or Safari';
                 } else if (url.includes('.aac')) {
-                    errorMsg = 'AAC stream error. The stream may be offline or the URL incorrect.';
+                    errorMsg = '⚠️ AAC stream error — station may be offline';
                 } else if (url.includes('.pls') || url.includes('.m3u')) {
-                    errorMsg = 'Playlist files (.pls, .m3u) are not supported. Use the direct stream URL instead.';
+                    errorMsg = '⚠️ Use the direct stream URL, not a .pls/.m3u playlist';
                 }
 
-                alert(errorMsg + '\n\nURL: ' + url);
+                showToast(errorMsg);
                 this.stop();
             }
 
@@ -1845,7 +1928,7 @@
 
             exportCSV() {
                 if (this.stations.length === 0) {
-                    alert('No stations to export');
+                    showToast('📭 Nothing to export yet');
                     return;
                 }
 
@@ -1874,7 +1957,7 @@
                         }).filter(s => s.title && s.url);
 
                         if (imported.length === 0) {
-                            alert('No valid stations found in file');
+                            showToast('📭 No valid stations in that file');
                             return;
                         }
 
@@ -1885,7 +1968,7 @@
                             this.updateNavigationButtons();
                         }
                     } catch (err) {
-                        alert('Error reading CSV file');
+                        showToast("⚠️ Couldn't read that CSV file");
                     }
                     this.fileInput.value = '';
                 };

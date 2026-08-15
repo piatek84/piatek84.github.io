@@ -3,7 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt Manager</title>
+    <title>Prompt Manager — Organize & Save Your AI Prompts, No Ads</title>
+    <meta name="description" content="Free prompt manager to organize, save, and export your AI prompts locally in your browser. Search, tag, and reuse prompts anytime. No ads, no sign-up, minimalist and private.">
+    <meta name="keywords" content="prompt manager, ai prompt organizer, save prompts, chatgpt prompts, prompt library, prompt manager app">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Jan Korwer">
+    <link rel="canonical" href="https://piatek84.github.io/prompt_manager.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Prompt Manager — Organize & Save Your AI Prompts, No Ads">
+    <meta property="og:description" content="Free prompt manager to organize, save, and export your AI prompts locally in your browser. Search, tag, and reuse prompts anytime.">
+    <meta property="og:url" content="https://piatek84.github.io/prompt_manager.html">
+    <meta property="og:site_name" content="Prompt Manager">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Prompt Manager — Organize & Save Your AI Prompts, No Ads">
+    <meta name="twitter:description" content="Free prompt manager to organize, save, and export your AI prompts locally in your browser. Search, tag, and reuse prompts anytime.">
+
+    <meta name="theme-color" content="#0f0f10">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Prompt Manager",
+      "url": "https://piatek84.github.io/prompt_manager.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Free prompt manager to organize, save, and export your AI prompts locally in your browser. Search, tag, and reuse prompts anytime."
+    }
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -507,6 +544,23 @@
         }
 
         loadPrompts();
+
+        // Double-click anywhere to toggle fullscreen (double-click again to exit).
+        document.addEventListener('dblclick', () => {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement &&
+                !document.mozFullScreenElement && !document.msFullscreenElement) {
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) elem.requestFullscreen();
+                else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+                else if (elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+                else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+                else if (document.msExitFullscreen) document.msExitFullscreen();
+            }
+        });
     </script>
 </body>
 </html>

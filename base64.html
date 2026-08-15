@@ -297,5 +297,24 @@
   });
 </script>
 
+<script>
+  // Double-click anywhere to toggle fullscreen (double-click again to exit).
+  document.addEventListener('dblclick', () => {
+    if(!document.fullscreenElement && !document.webkitFullscreenElement &&
+       !document.mozFullScreenElement && !document.msFullscreenElement){
+      const elem = document.documentElement;
+      if(elem.requestFullscreen) elem.requestFullscreen();
+      else if(elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      else if(elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+      else if(elem.msRequestFullscreen) elem.msRequestFullscreen();
+    } else {
+      if(document.exitFullscreen) document.exitFullscreen();
+      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if(document.mozCancelFullScreen) document.mozCancelFullScreen();
+      else if(document.msExitFullscreen) document.msExitFullscreen();
+    }
+  });
+</script>
+
 </body>
 </html>
