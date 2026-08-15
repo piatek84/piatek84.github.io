@@ -14,40 +14,70 @@
         }
 
         :root {
-            --bg-dark: #0a0a0a;
-            --bg-medium: #1a1a1a;
-            --bg-light: #2a2a2a;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --accent: #404040;
-            --border: #333333;
-            --page-grad-1: #0a0a0a;
-            --page-grad-2: #1a1a1a;
+            --bg: #0f0f10;
+            --panel: #1a1a1c;
+            --border: #2c2c2e;
+            --text: #e8e8ea;
+            --muted: #8a8a8e;
+            --surface: #242426;
+            --surface-hover: #333336;
         }
 
-        html[data-theme="light"] {
-            --bg-dark: #eef0f3;
-            --bg-medium: #ffffff;
-            --bg-light: #e6e8ec;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --accent: #d4d6db;
-            --border: #dcdee2;
-            --page-grad-1: #f2f3f5;
-            --page-grad-2: #e4e6ea;
+        [data-theme="light"] {
+            --bg: #fafafa;
+            --panel: #ffffff;
+            --border: #e2e2e4;
+            --text: #1a1a1c;
+            --muted: #6b6b6f;
+            --surface: #f0f0f2;
+            --surface-hover: #e4e4e7;
         }
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, var(--page-grad-1) 0%, var(--page-grad-2) 100%);
-            color: var(--text-primary);
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            gap: 16px;
             padding: 20px;
             overflow-x: hidden;
             transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        footer {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .kofi {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            color: var(--muted);
+            text-decoration: none;
+            border: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .kofi:hover {
+            color: var(--text);
+            border-color: var(--muted);
+        }
+
+        .kofi svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
         }
 
         .container {
@@ -66,7 +96,7 @@
 
         /* RADIO PLAYER */
         .radio-player {
-            background: var(--bg-medium);
+            background: var(--panel);
             border-radius: 24px;
             padding: 60px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
@@ -83,19 +113,17 @@
 
         /* DATETIME DISPLAY */
         .datetime-display {
-            position: absolute;
-            top: 24px;
-            left: 74px;
-            text-align: left;
+            grid-column: 2;
+            text-align: center;
             font-size: 11px;
-            color: var(--text-secondary);
+            color: var(--muted);
             letter-spacing: 1px;
         }
 
         .datetime-time {
             font-size: 16px;
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--text);
             margin-bottom: 2px;
         }
 
@@ -123,7 +151,7 @@
             font-weight: 300;
             letter-spacing: 4px;
             text-transform: uppercase;
-            color: var(--text-secondary);
+            color: var(--muted);
             margin-bottom: 8px;
         }
 
@@ -210,9 +238,9 @@
             width: 64px;
             height: 64px;
             border-radius: 50%;
-            background: var(--bg-light);
+            background: var(--surface);
             border: 2px solid var(--border);
-            color: var(--text-primary);
+            color: var(--text);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -233,7 +261,7 @@
         }
 
         .control-btn:not(:disabled):hover {
-            background: var(--accent);
+            background: var(--surface-hover);
             transform: scale(1.05);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         }
@@ -243,8 +271,8 @@
         }
 
         .control-btn.playing {
-            background: var(--text-primary);
-            color: var(--bg-dark);
+            background: var(--text);
+            color: var(--bg);
         }
 
         /* VOLUME CONTROL */
@@ -257,7 +285,7 @@
             font-weight: 600;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: var(--text-secondary);
+            color: var(--muted);
             margin-bottom: 16px;
             display: block;
         }
@@ -266,7 +294,7 @@
             width: 100%;
             height: 6px;
             border-radius: 3px;
-            background: var(--bg-light);
+            background: var(--surface);
             outline: none;
             -webkit-appearance: none;
             position: relative;
@@ -278,7 +306,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: var(--text-primary);
+            background: var(--text);
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -292,7 +320,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: var(--text-primary);
+            background: var(--text);
             cursor: pointer;
             border: none;
             transition: all 0.2s ease;
@@ -352,100 +380,46 @@
             }
         }
 
-        .back-toggle {
-            position: absolute;
-            left: 20px;
-            top: 20px;
+        /* TOPBAR — in-flow (not absolutely positioned) so it never overlaps
+           the header content at narrow widths; wraps gracefully on mobile.
+           Grid with two equal outer columns keeps the datetime truly
+           centered (like the title below it) regardless of how wide the
+           button groups on either side are. */
+        .player-topbar {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .topbar-actions {
+            grid-column: 3;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .icon-btn {
             width: 40px;
             height: 40px;
-            background: var(--bg-medium);
+            flex-shrink: 0;
+            background: var(--panel);
             border: 2px solid var(--border);
             border-radius: 10px;
-            color: var(--text-primary);
+            color: var(--text);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
             font-size: 18px;
-            z-index: 100;
             text-decoration: none;
         }
 
-        .back-toggle:hover {
-            background: var(--accent);
-            transform: scale(1.05);
-        }
-
-        .sidebar-toggle {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            width: 40px;
-            height: 40px;
-            background: var(--bg-medium);
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            color: var(--text-primary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-size: 18px;
-            z-index: 100;
-        }
-
-        .sidebar-toggle:hover {
-            background: var(--accent);
-            transform: scale(1.05);
-        }
-
-        .fullscreen-toggle {
-            position: absolute;
-            right: 70px;
-            top: 20px;
-            width: 40px;
-            height: 40px;
-            background: var(--bg-medium);
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            color: var(--text-primary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-size: 18px;
-            z-index: 100;
-        }
-
-        .fullscreen-toggle:hover {
-            background: var(--accent);
-            transform: scale(1.05);
-        }
-
-        .theme-toggle {
-            position: absolute;
-            right: 120px;
-            top: 20px;
-            width: 40px;
-            height: 40px;
-            background: var(--bg-medium);
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            color: var(--text-primary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-size: 18px;
-            z-index: 100;
-        }
-
-        .theme-toggle:hover {
-            background: var(--accent);
+        .icon-btn:hover {
+            background: var(--surface-hover);
             transform: scale(1.05);
         }
 
@@ -458,9 +432,13 @@
             padding: 20px;
         }
 
+        body.fullscreen footer {
+            display: none;
+        }
+
         /* ADD STATION FORM */
         .add-station {
-            background: var(--bg-medium);
+            background: var(--panel);
             border-radius: 16px;
             padding: 24px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -472,7 +450,7 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-bottom: 16px;
-            color: var(--text-secondary);
+            color: var(--muted);
         }
 
         .file-upload-section {
@@ -485,8 +463,8 @@
             display: block;
             width: 100%;
             padding: 12px 24px;
-            background: var(--bg-dark);
-            color: var(--text-primary);
+            background: var(--bg);
+            color: var(--text);
             border: 1px solid var(--border);
             border-radius: 8px;
             font-family: 'Montserrat', sans-serif;
@@ -500,8 +478,8 @@
         }
 
         .file-upload-label:hover {
-            background: var(--bg-light);
-            border-color: var(--text-primary);
+            background: var(--surface);
+            border-color: var(--text);
             transform: translateY(-2px);
         }
 
@@ -512,7 +490,7 @@
         .current-file {
             margin-top: 12px;
             font-size: 11px;
-            color: var(--text-secondary);
+            color: var(--muted);
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
@@ -534,7 +512,7 @@
             font-weight: 600;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: var(--text-secondary);
+            color: var(--muted);
             margin-bottom: 12px;
             display: block;
         }
@@ -544,7 +522,7 @@
             justify-content: space-between;
             margin-bottom: 8px;
             font-size: 11px;
-            color: var(--text-secondary);
+            color: var(--muted);
         }
 
         .progress-wrapper {
@@ -559,7 +537,7 @@
             position: absolute;
             width: 100%;
             height: 6px;
-            background: var(--bg-light);
+            background: var(--surface);
             border-radius: 3px;
             top: 50%;
             transform: translateY(-50%);
@@ -568,7 +546,7 @@
         .progress-filled {
             position: absolute;
             height: 6px;
-            background: var(--text-primary);
+            background: var(--text);
             border-radius: 3px;
             top: 50%;
             transform: translateY(-50%);
@@ -601,7 +579,7 @@
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: var(--text-primary);
+            background: var(--text);
             cursor: pointer;
             margin-top: -5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -624,7 +602,7 @@
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: var(--text-primary);
+            background: var(--text);
             cursor: pointer;
             border: none;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -643,10 +621,10 @@
         .input-field {
             width: 100%;
             padding: 12px 16px;
-            background: var(--bg-dark);
+            background: var(--bg);
             border: 1px solid var(--border);
             border-radius: 8px;
-            color: var(--text-primary);
+            color: var(--text);
             font-family: 'Montserrat', sans-serif;
             font-size: 14px;
             transition: all 0.3s ease;
@@ -654,19 +632,19 @@
 
         .input-field:focus {
             outline: none;
-            border-color: var(--text-primary);
-            background: var(--bg-light);
+            border-color: var(--text);
+            background: var(--surface);
         }
 
         .input-field::placeholder {
-            color: var(--text-secondary);
+            color: var(--muted);
         }
 
         .btn {
             width: 100%;
             padding: 12px 24px;
-            background: var(--text-primary);
-            color: var(--bg-dark);
+            background: var(--text);
+            color: var(--bg);
             border: none;
             border-radius: 8px;
             font-family: 'Montserrat', sans-serif;
@@ -679,7 +657,7 @@
         }
 
         .btn:hover {
-            background: var(--text-secondary);
+            background: var(--muted);
             transform: translateY(-2px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         }
@@ -690,7 +668,7 @@
 
         /* STATIONS LIST */
         .stations-list {
-            background: var(--bg-medium);
+            background: var(--panel);
             border-radius: 16px;
             padding: 24px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -703,7 +681,7 @@
         }
 
         .stations-list.collapsed:hover {
-            background: var(--bg-light);
+            background: var(--surface);
         }
 
         .stations-list h3 {
@@ -712,7 +690,7 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-bottom: 16px;
-            color: var(--text-secondary);
+            color: var(--muted);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -753,7 +731,7 @@
 
         /* MP3 PLAYLIST */
         .mp3-playlist {
-            background: var(--bg-medium);
+            background: var(--panel);
             border-radius: 16px;
             padding: 24px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -768,11 +746,11 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-bottom: 16px;
-            color: var(--text-secondary);
+            color: var(--muted);
         }
 
         .mp3-item {
-            background: var(--bg-dark);
+            background: var(--bg);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 12px 16px;
@@ -787,26 +765,26 @@
         }
 
         .mp3-item:hover {
-            background: var(--bg-light);
-            border-color: var(--accent);
+            background: var(--surface);
+            border-color: var(--surface-hover);
             transform: translateX(4px);
         }
 
         .mp3-item.active {
-            background: var(--text-primary);
-            color: var(--bg-dark);
-            border-color: var(--text-primary);
+            background: var(--text);
+            color: var(--bg);
+            border-color: var(--text);
         }
 
         .mp3-item-number {
             font-size: 12px;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: var(--muted);
             min-width: 24px;
         }
 
         .mp3-item.active .mp3-item-number {
-            color: var(--bg-dark);
+            color: var(--bg);
         }
 
         .mp3-item-name {
@@ -820,19 +798,19 @@
 
         .mp3-item-duration {
             font-size: 11px;
-            color: var(--text-secondary);
+            color: var(--muted);
             margin-left: auto;
         }
 
         .mp3-item.active .mp3-item-duration {
-            color: var(--bg-dark);
+            color: var(--bg);
         }
 
         .clear-playlist-btn {
             width: 100%;
             padding: 10px;
-            background: var(--bg-dark);
-            color: var(--text-secondary);
+            background: var(--bg);
+            color: var(--muted);
             border: 1px solid var(--border);
             border-radius: 8px;
             font-family: 'Montserrat', sans-serif;
@@ -846,8 +824,8 @@
         }
 
         .clear-playlist-btn:hover {
-            background: var(--bg-light);
-            color: var(--text-primary);
+            background: var(--surface);
+            color: var(--text);
         }
 
         /* SCROLLBAR for MP3 playlist */
@@ -856,21 +834,21 @@
         }
 
         .mp3-playlist::-webkit-scrollbar-track {
-            background: var(--bg-dark);
+            background: var(--bg);
             border-radius: 4px;
         }
 
         .mp3-playlist::-webkit-scrollbar-thumb {
-            background: var(--accent);
+            background: var(--surface-hover);
             border-radius: 4px;
         }
 
         .mp3-playlist::-webkit-scrollbar-thumb:hover {
-            background: var(--text-secondary);
+            background: var(--muted);
         }
 
         .station-item {
-            background: var(--bg-dark);
+            background: var(--bg);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 16px;
@@ -883,15 +861,15 @@
         }
 
         .station-item:hover {
-            background: var(--bg-light);
-            border-color: var(--accent);
+            background: var(--surface);
+            border-color: var(--surface-hover);
             transform: translateX(4px);
         }
 
         .station-item.active {
-            background: var(--text-primary);
-            color: var(--bg-dark);
-            border-color: var(--text-primary);
+            background: var(--text);
+            color: var(--bg);
+            border-color: var(--text);
         }
 
         .station-item-title {
@@ -903,7 +881,7 @@
 
         .station-item-url {
             font-size: 11px;
-            color: var(--text-secondary);
+            color: var(--muted);
             opacity: 0.7;
             white-space: nowrap;
             overflow: hidden;
@@ -913,7 +891,7 @@
         }
 
         .station-item.active .station-item-url {
-            color: var(--bg-dark);
+            color: var(--bg);
         }
 
         .delete-btn {
@@ -925,7 +903,7 @@
             background: rgba(255, 255, 255, 0.1);
             border: none;
             border-radius: 50%;
-            color: var(--text-primary);
+            color: var(--text);
             cursor: pointer;
             font-size: 14px;
             display: flex;
@@ -960,23 +938,23 @@
         }
 
         #stationsList::-webkit-scrollbar-track {
-            background: var(--bg-dark);
+            background: var(--bg);
             border-radius: 4px;
         }
 
         #stationsList::-webkit-scrollbar-thumb {
-            background: var(--accent);
+            background: var(--surface-hover);
             border-radius: 4px;
         }
 
         #stationsList::-webkit-scrollbar-thumb:hover {
-            background: var(--text-secondary);
+            background: var(--muted);
         }
 
         .btn-secondary {
             padding: 12px 16px;
-            background: var(--bg-dark);
-            color: var(--text-primary);
+            background: var(--bg);
+            color: var(--text);
             border: 1px solid var(--border);
             border-radius: 8px;
             font-family: 'Montserrat', sans-serif;
@@ -989,8 +967,8 @@
         }
 
         .btn-secondary:hover {
-            background: var(--bg-light);
-            border-color: var(--text-primary);
+            background: var(--surface);
+            border-color: var(--text);
             transform: translateY(-2px);
         }
 
@@ -1021,42 +999,66 @@
             }
         }
 
+        @media (max-width: 480px) {
+            /* The two button groups are very different widths (1 icon vs 3),
+               so forcing equal grid columns fights for space on narrow
+               phones. Fall back to a wrapping flex row instead: buttons on
+               top, datetime centered on its own full-width line below. */
+            .player-topbar {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+            }
+
+            .datetime-display {
+                order: 3;
+                width: 100%;
+            }
+        }
+
         /* SCROLLBAR */
         .stations-list::-webkit-scrollbar {
             width: 8px;
         }
 
         .stations-list::-webkit-scrollbar-track {
-            background: var(--bg-dark);
+            background: var(--bg);
             border-radius: 4px;
         }
 
         .stations-list::-webkit-scrollbar-thumb {
-            background: var(--accent);
+            background: var(--surface-hover);
             border-radius: 4px;
         }
 
         .stations-list::-webkit-scrollbar-thumb:hover {
-            background: var(--text-secondary);
+            background: var(--muted);
         }
     </style>
 </head>
 <body>
     <script>
-        // Apply saved theme before paint to avoid a flash of the wrong theme
-        document.documentElement.setAttribute('data-theme', localStorage.getItem('radioTheme') || 'dark');
+        // Apply saved theme before paint to avoid a flash of the wrong theme.
+        // Shares the same 'theme' key and dark-by-default convention as the
+        // rest of the site (base64.html, pomodoro.html, digitgrid.html, ...).
+        if((localStorage.getItem('theme') || 'dark') === 'light'){
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
     </script>
     <div class="container">
         <!-- RADIO PLAYER -->
         <div class="radio-player">
-            <a class="back-toggle" href="index.html" title="Back to index">←</a>
-            <button class="sidebar-toggle" id="sidebarToggle">✕</button>
-            <button class="fullscreen-toggle" id="fullscreenToggle" title="Fullscreen">⛶</button>
-            <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">🌙</button>
-
-            <div class="datetime-display">
-                <div class="datetime-time" id="timeDisplay">00:00</div>
-                <div class="datetime-date" id="dateDisplay">01/01/2024</div>
+            <div class="player-topbar">
+                <a class="icon-btn" href="index.html" title="Back to index">←</a>
+                <div class="datetime-display">
+                    <div class="datetime-time" id="timeDisplay">00:00</div>
+                    <div class="datetime-date" id="dateDisplay">01/01/2024</div>
+                </div>
+                <div class="topbar-actions">
+                    <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
+                    <button class="icon-btn" id="fullscreenToggle" title="Fullscreen">⛶</button>
+                    <button class="icon-btn" id="sidebarToggle" title="Menu">☰</button>
+                </div>
             </div>
 
             <div class="radio-header">
@@ -1095,6 +1097,18 @@
 
         </div>
     </div>
+
+    <footer>
+        <a class="kofi" href="https://ko-fi.com/jankorwer" target="_blank" rel="noopener" title="Buy me a coffee">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="13.2" y1="2" x2="11.7" y2="6"/>
+                <rect x="5" y="6" width="14" height="3" rx="1.4"/>
+                <path d="M6 9 L7 20 Q7.2 21 8.2 21 L15.8 21 Q16.8 21 17 20 L18 9 Z"/>
+                <line x1="6.7" y1="14" x2="17.3" y2="14"/>
+            </svg>
+            Buy me a coffee
+        </a>
+    </footer>
 
     <!-- MENU POPUP OVERLAY -->
     <div class="overlay-backdrop" id="overlayBackdrop"></div>
@@ -1308,17 +1322,23 @@
                 this.stationsListContainer.classList.toggle('collapsed');
             }
 
+            // Same 'theme' localStorage key and dark-by-default, icon-shows-
+            // current-mode convention as the rest of the site.
             toggleTheme() {
-                const current = document.documentElement.getAttribute('data-theme') || 'dark';
-                const next = current === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', next);
-                localStorage.setItem('radioTheme', next);
+                const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                const next = current === 'light' ? 'dark' : 'light';
+                if(next === 'light'){
+                    document.documentElement.setAttribute('data-theme', 'light');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                }
+                localStorage.setItem('theme', next);
                 this.updateThemeIcon();
             }
 
             updateThemeIcon() {
-                const current = document.documentElement.getAttribute('data-theme') || 'dark';
-                this.themeToggle.textContent = current === 'dark' ? '☀' : '🌙';
+                const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                this.themeToggle.textContent = current === 'light' ? '☀️' : '🌙';
             }
 
             toggleFullscreen() {
@@ -1791,7 +1811,7 @@
                 this.stationsList.innerHTML = '';
 
                 if (this.stations.length === 0) {
-                    this.stationsList.innerHTML = '<p style="color: var(--text-secondary); font-size: 12px; text-align: center; padding: 20px;">No saved stations</p>';
+                    this.stationsList.innerHTML = '<p style="color: var(--muted); font-size: 12px; text-align: center; padding: 20px;">No saved stations</p>';
                     return;
                 }
 
