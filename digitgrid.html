@@ -229,8 +229,12 @@
   .digit-tracker-item.completed::after{transform:translateY(-50%) rotate(-45deg);}
   .sudoku-grid{
     display:grid;
-    grid-template-columns:repeat(9, minmax(28px, 44px));
-    grid-template-rows:repeat(9, minmax(28px, 44px));
+    grid-template-columns:repeat(9, 1fr);
+    grid-template-rows:repeat(9, 1fr);
+    aspect-ratio:1 / 1;
+    width:100%;
+    max-width:396px;
+    min-width:0;
     border:2px solid var(--muted);
     border-radius:6px;
     overflow:hidden;
@@ -705,6 +709,18 @@
 
   function onCellInput(e){
     const input = e.target;
+
+    // Once a cell is confirmed correct it's locked against edits — but we
+    // enforce that ourselves instead of via the readonly attribute, because
+    // making a focused input readonly dismisses the mobile on-screen
+    // keyboard. Just snap the value back and ignore further typing.
+    if(input.classList.contains('correct')){
+      const row = parseInt(input.dataset.row, 10);
+      const col = parseInt(input.dataset.col, 10);
+      input.value = String(solution[row][col]);
+      return;
+    }
+
     // Only 1-9 are valid Sudoku digits — 0 (and anything else) is stripped
     // out below, but the *raw* value tells us whether the field was truly
     // emptied (backspace) or just typed with an out-of-range character.
@@ -736,7 +752,6 @@
 
     if(parseInt(digit, 10) === solution[row][col]){
       input.classList.add('correct');
-      input.readOnly = true;
       clearCandidates(input);
       removeCandidateFromPeers(row, col, digit);
       updateDigitTracker();
