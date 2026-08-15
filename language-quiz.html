@@ -98,6 +98,28 @@
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
         }
 
+        .back-toggle {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .back-toggle:hover {
+            background: var(--accent);
+        }
+
         .quiz-header {
             text-align: center;
             margin-bottom: 40px;
@@ -634,6 +656,7 @@
 <body>
     <div class="container" id="container">
         <div class="quiz-player">
+            <a class="back-toggle" href="index.html" title="Back to index">←</a>
             <!-- DateTime Display -->
             <div class="datetime-display">
                 <div class="datetime-time" id="time">00:00</div>

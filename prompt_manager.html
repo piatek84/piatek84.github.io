@@ -57,7 +57,29 @@
         }
 
         /* THEME TOGGLE */
-        .theme-toggle-wrap { display: flex; justify-content: flex-end; margin-bottom: 1.25rem; }
+        .theme-toggle-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .back-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-medium);
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+
+        .back-link:hover {
+            border-color: var(--green);
+            color: var(--green);
+            transform: translateY(-1px);
+        }
 
         .theme-toggle {
             display: flex;
@@ -204,6 +226,7 @@
     <div class="container">
 
         <div class="theme-toggle-wrap">
+            <a class="back-link" href="index.html" title="Back to index">←</a>
             <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Switch theme">
                 <span class="toggle-icon" id="themeIcon">☀️</span>
                 <span id="themeLabel">Light mode</span>

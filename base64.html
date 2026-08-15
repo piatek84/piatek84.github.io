@@ -83,6 +83,11 @@
     margin:0;
     max-width:none;
   }
+  .top-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
   .toggle{
     background:none;
     border:1px solid var(--border);
@@ -95,6 +100,7 @@
     align-items:center;
     justify-content:center;
     font-size:16px;
+    text-decoration:none;
   }
   .toggle:hover{color:var(--text);border-color:var(--muted);}
   h1{
@@ -199,7 +205,10 @@
 <body>
 
 <div class="top">
-  <h1>Base64</h1>
+  <div class="top-left">
+    <a class="toggle" href="index.html" title="Back to index">←</a>
+    <h1>Base64</h1>
+  </div>
   <button class="toggle" id="themeToggle" title="Toggle theme">🌙</button>
 </div>
 

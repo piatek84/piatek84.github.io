@@ -85,7 +85,7 @@
         .datetime-display {
             position: absolute;
             top: 24px;
-            left: 24px;
+            left: 74px;
             text-align: left;
             font-size: 11px;
             color: var(--text-secondary);
@@ -350,6 +350,31 @@
                 grid-template-columns: 1fr;
                 max-width: 380px;
             }
+        }
+
+        .back-toggle {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-medium);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            z-index: 100;
+            text-decoration: none;
+        }
+
+        .back-toggle:hover {
+            background: var(--accent);
+            transform: scale(1.05);
         }
 
         .sidebar-toggle {
@@ -1024,6 +1049,7 @@
     <div class="container">
         <!-- RADIO PLAYER -->
         <div class="radio-player">
+            <a class="back-toggle" href="index.html" title="Back to index">←</a>
             <button class="sidebar-toggle" id="sidebarToggle">✕</button>
             <button class="fullscreen-toggle" id="fullscreenToggle" title="Fullscreen">⛶</button>
             <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">🌙</button>

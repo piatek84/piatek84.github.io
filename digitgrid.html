@@ -94,6 +94,11 @@
     margin:0;
     max-width:none;
   }
+  .top-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
   .toggle{
     background:none;
     border:1px solid var(--border);
@@ -106,6 +111,7 @@
     align-items:center;
     justify-content:center;
     font-size:16px;
+    text-decoration:none;
   }
   .toggle:hover{color:var(--text);border-color:var(--muted);}
   h1{
@@ -203,6 +209,26 @@
   .cell.thick-bottom{border-bottom:2px solid var(--muted);}
   .cell:focus{box-shadow:inset 0 0 0 2px var(--text);}
 
+  .cell-wrap{position:relative;}
+  .candidates{
+    position:absolute;
+    top:3px;
+    left:4px;
+    right:2px;
+    font-size:10px;
+    line-height:1;
+    font-weight:700;
+    letter-spacing:.5px;
+    color:#e8820c;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    text-align:left;
+    white-space:nowrap;
+    overflow:hidden;
+    pointer-events:none;
+    user-select:none;
+    z-index:1;
+  }
+
   .message{
     text-align:center;
     font-size:14px;
@@ -262,7 +288,10 @@
 <body>
 
 <div class="top">
-  <h1>Digit Grid</h1>
+  <div class="top-left">
+    <a class="toggle" href="index.html" title="Back to index">←</a>
+    <h1>Digit Grid</h1>
+  </div>
   <button class="toggle" id="themeToggle" title="Toggle theme">🌙</button>
 </div>
 
@@ -472,6 +501,9 @@
     gridEl.innerHTML = '';
     for(let row=0; row<9; row++){
       for(let col=0; col<9; col++){
+        const wrap = document.createElement('div');
+        wrap.className = 'cell-wrap';
+
         const input = document.createElement('input');
         input.type = 'text';
         input.inputMode = 'numeric';
@@ -495,7 +527,16 @@
         // Arrow-key navigation must work from every cell, given or not —
         // otherwise moving onto a fixed clue dead-ends the keyboard.
         input.addEventListener('keydown', onCellKeydown);
-        gridEl.appendChild(input);
+        input.addEventListener('blur', onCellBlur);
+
+        const candSpan = document.createElement('div');
+        candSpan.className = 'candidates';
+
+        // Candidates span must come after the input in the DOM so it
+        // paints on top of the input's own background.
+        wrap.appendChild(input);
+        wrap.appendChild(candSpan);
+        gridEl.appendChild(wrap);
       }
     }
 
@@ -520,15 +561,70 @@
     if(parseInt(digit, 10) === solution[row][col]){
       input.classList.add('correct');
       input.readOnly = true;
+      clearCandidates(input);
       checkForWin();
     } else {
       input.classList.add('wrong');
     }
   }
 
+  // ---------------- Pencil-mark candidates (x + digit) ----------------
+
+  // Tracks the cell currently "armed" after an 'x' keypress, waiting for
+  // the digit (or delete) that completes the pencil-mark shortcut.
+  let pencilCell = null;
+
+  function getCandidatesEl(input){
+    return input.parentElement.querySelector('.candidates');
+  }
+
+  function addCandidate(input, digit){
+    const current = input.dataset.candidates ? input.dataset.candidates.split(',') : [];
+    if(!current.includes(digit)){
+      current.push(digit);
+      current.sort();
+      input.dataset.candidates = current.join(',');
+      getCandidatesEl(input).textContent = current.join(' ');
+    }
+  }
+
+  function clearCandidates(input){
+    input.dataset.candidates = '';
+    getCandidatesEl(input).textContent = '';
+  }
+
+  function onCellBlur(e){
+    if(pencilCell === e.target) pencilCell = null;
+  }
+
   function onCellKeydown(e){
-    const row = parseInt(e.target.dataset.row, 10);
-    const col = parseInt(e.target.dataset.col, 10);
+    const input = e.target;
+    const key = e.key;
+
+    if(key === 'x' || key === 'X'){
+      e.preventDefault();
+      if(!input.readOnly) pencilCell = input;
+      return;
+    }
+
+    if(pencilCell === input){
+      if(/^[1-9]$/.test(key)){
+        e.preventDefault();
+        addCandidate(input, key);
+        pencilCell = null;
+        return;
+      }
+      if(key === 'Delete' || key === 'Backspace'){
+        e.preventDefault();
+        clearCandidates(input);
+        pencilCell = null;
+        return;
+      }
+      pencilCell = null;
+    }
+
+    const row = parseInt(input.dataset.row, 10);
+    const col = parseInt(input.dataset.col, 10);
     let target = null;
 
     if(e.key === 'ArrowRight') target = getCell(row, col+1);
@@ -584,6 +680,7 @@
       if(parseInt(val, 10) === solution[row][col]){
         cell.classList.add('correct');
         cell.readOnly = true;
+        clearCandidates(cell);
       } else {
         cell.classList.add('wrong');
         wrongCount++;
