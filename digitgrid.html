@@ -230,17 +230,19 @@
   .cell-wrap{position:relative;}
   .candidates{
     position:absolute;
-    top:3px;
-    left:4px;
-    right:2px;
-    font-size:10px;
-    line-height:1;
+    inset:0;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    align-content:start;
+    justify-items:center;
+    gap:1px 0;
+    padding:4px;
+    font-size:8px;
+    line-height:1.15;
     font-weight:700;
-    letter-spacing:.5px;
+    letter-spacing:0;
     color:#e8820c;
     font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-    text-align:left;
-    white-space:nowrap;
     overflow:hidden;
     pointer-events:none;
     user-select:none;
@@ -630,22 +632,27 @@
 
   function onCellInput(e){
     const input = e.target;
-    const digit = input.value.replace(/[^1-9]/g, '').slice(-1);
-    input.value = digit;
-    input.classList.remove('correct', 'wrong');
+    // Only 1-9 are valid Sudoku digits — 0 (and anything else) is stripped
+    // out below, but the *raw* value tells us whether the field was truly
+    // emptied (backspace) or just typed with an out-of-range character.
+    const raw = input.value;
+    const digit = raw.replace(/[^1-9]/g, '').slice(-1);
 
     // In pencil mode (the mobile-friendly stand-in for the desktop "x + digit"
     // shortcut), every digit typed becomes a note instead of a guess, and the
     // cell itself is kept empty.
     if(pencilModeOn){
-      if(digit === ''){
+      input.value = '';
+      if(raw === ''){
         clearCandidates(input);
-      } else {
+      } else if(digit !== ''){
         toggleCandidate(input, digit);
-        input.value = '';
       }
       return;
     }
+
+    input.value = digit;
+    input.classList.remove('correct', 'wrong');
 
     if(digit === ''){
       return;
@@ -671,9 +678,20 @@
     return input.parentElement.querySelector('.candidates');
   }
 
+  // Renders one <span> per digit so the CSS grid can wrap them two per row
+  // instead of relying on a single line of text that gets clipped.
+  function renderCandidates(el, digits){
+    el.innerHTML = '';
+    digits.forEach(d => {
+      const span = document.createElement('span');
+      span.textContent = d;
+      el.appendChild(span);
+    });
+  }
+
   function clearCandidates(input){
     input.dataset.candidates = '';
-    getCandidatesEl(input).textContent = '';
+    renderCandidates(getCandidatesEl(input), []);
   }
 
   function toggleCandidate(input, digit){
@@ -686,7 +704,7 @@
       current.splice(idx, 1);
     }
     input.dataset.candidates = current.join(',');
-    getCandidatesEl(input).textContent = current.join(' ');
+    renderCandidates(getCandidatesEl(input), current);
   }
 
   // Once a digit is confirmed correct in a cell, it can no longer be a valid
@@ -709,7 +727,7 @@
         if(idx !== -1){
           current.splice(idx, 1);
           peer.dataset.candidates = current.join(',');
-          getCandidatesEl(peer).textContent = current.join(' ');
+          renderCandidates(getCandidatesEl(peer), current);
         }
       }
     }
