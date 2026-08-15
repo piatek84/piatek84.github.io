@@ -282,6 +282,24 @@
     width:140px;
     white-space:nowrap;
   }
+  #pencilModeBtn{
+    width:44px;
+    height:44px;
+    padding:0;
+    font-size:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  #pencilModeBtn.active{
+    background:var(--text);
+    color:var(--bg);
+    border-color:var(--text);
+  }
+  .pencil-icon{
+    display:inline-block;
+    transform:scaleX(-1);
+  }
   .sudoku-grid.notes-hidden .candidates{
     display:none;
   }
@@ -342,6 +360,7 @@
     <div class="buttons">
       <button class="action" id="newGameBtn">New Puzzle</button>
       <button class="action secondary" id="toggleNotesBtn">Hide notes</button>
+      <button class="action secondary" id="pencilModeBtn" title="Pencil mode — press x (or tap this) to toggle it, then numbers become notes instead of guesses"><span class="pencil-icon">✏️</span></button>
     </div>
   </div>
 </main>
@@ -543,6 +562,14 @@
 
   applyNotesVisibility();
 
+  const pencilModeBtn = document.getElementById('pencilModeBtn');
+  let pencilModeOn = false;
+
+  pencilModeBtn.addEventListener('click', () => {
+    pencilModeOn = !pencilModeOn;
+    pencilModeBtn.classList.toggle('active', pencilModeOn);
+  });
+
   function setMessage(text, type){
     messageEl.textContent = text;
     messageEl.className = 'message' + (type ? ' ' + type : '');
@@ -586,7 +613,6 @@
         // Arrow-key navigation must work from every cell, given or not —
         // otherwise moving onto a fixed clue dead-ends the keyboard.
         input.addEventListener('keydown', onCellKeydown);
-        input.addEventListener('blur', onCellBlur);
 
         const candSpan = document.createElement('div');
         candSpan.className = 'candidates';
@@ -608,6 +634,19 @@
     input.value = digit;
     input.classList.remove('correct', 'wrong');
 
+    // In pencil mode (the mobile-friendly stand-in for the desktop "x + digit"
+    // shortcut), every digit typed becomes a note instead of a guess, and the
+    // cell itself is kept empty.
+    if(pencilModeOn){
+      if(digit === ''){
+        clearCandidates(input);
+      } else {
+        toggleCandidate(input, digit);
+        input.value = '';
+      }
+      return;
+    }
+
     if(digit === ''){
       return;
     }
@@ -619,30 +658,17 @@
       input.classList.add('correct');
       input.readOnly = true;
       clearCandidates(input);
+      removeCandidateFromPeers(row, col, digit);
       checkForWin();
     } else {
       input.classList.add('wrong');
     }
   }
 
-  // ---------------- Pencil-mark candidates (x + digit) ----------------
-
-  // Tracks the cell currently "armed" after an 'x' keypress, waiting for
-  // the digit (or delete) that completes the pencil-mark shortcut.
-  let pencilCell = null;
+  // ---------------- Pencil-mark candidates ----------------
 
   function getCandidatesEl(input){
     return input.parentElement.querySelector('.candidates');
-  }
-
-  function addCandidate(input, digit){
-    const current = input.dataset.candidates ? input.dataset.candidates.split(',') : [];
-    if(!current.includes(digit)){
-      current.push(digit);
-      current.sort();
-      input.dataset.candidates = current.join(',');
-      getCandidatesEl(input).textContent = current.join(' ');
-    }
   }
 
   function clearCandidates(input){
@@ -650,34 +676,56 @@
     getCandidatesEl(input).textContent = '';
   }
 
-  function onCellBlur(e){
-    if(pencilCell === e.target) pencilCell = null;
+  function toggleCandidate(input, digit){
+    const current = input.dataset.candidates ? input.dataset.candidates.split(',') : [];
+    const idx = current.indexOf(digit);
+    if(idx === -1){
+      current.push(digit);
+      current.sort();
+    } else {
+      current.splice(idx, 1);
+    }
+    input.dataset.candidates = current.join(',');
+    getCandidatesEl(input).textContent = current.join(' ');
+  }
+
+  // Once a digit is confirmed correct in a cell, it can no longer be a valid
+  // note anywhere else in that row, column, or 3x3 box — so sweep it out of
+  // any other cell's pencil marks too.
+  function removeCandidateFromPeers(row, col, digit){
+    const boxRow = row - (row % 3), boxCol = col - (col % 3);
+    for(let r = 0; r < 9; r++){
+      for(let c = 0; c < 9; c++){
+        if(r === row && c === col) continue;
+        const sameRow = r === row;
+        const sameCol = c === col;
+        const sameBox = r >= boxRow && r < boxRow + 3 && c >= boxCol && c < boxCol + 3;
+        if(!sameRow && !sameCol && !sameBox) continue;
+
+        const peer = getCell(r, c);
+        if(!peer || !peer.dataset.candidates) continue;
+        const current = peer.dataset.candidates.split(',');
+        const idx = current.indexOf(digit);
+        if(idx !== -1){
+          current.splice(idx, 1);
+          peer.dataset.candidates = current.join(',');
+          getCandidatesEl(peer).textContent = current.join(' ');
+        }
+      }
+    }
   }
 
   function onCellKeydown(e){
     const input = e.target;
     const key = e.key;
 
+    // 'x' toggles the same persistent pencil mode as the ✏️ button — it
+    // stays on across cells until 'x' (or the button) is pressed again.
     if(key === 'x' || key === 'X'){
       e.preventDefault();
-      if(!input.readOnly) pencilCell = input;
+      pencilModeOn = !pencilModeOn;
+      pencilModeBtn.classList.toggle('active', pencilModeOn);
       return;
-    }
-
-    if(pencilCell === input){
-      if(/^[1-9]$/.test(key)){
-        e.preventDefault();
-        addCandidate(input, key);
-        pencilCell = null;
-        return;
-      }
-      if(key === 'Delete' || key === 'Backspace'){
-        e.preventDefault();
-        clearCandidates(input);
-        pencilCell = null;
-        return;
-      }
-      pencilCell = null;
     }
 
     const row = parseInt(input.dataset.row, 10);
