@@ -186,8 +186,47 @@
   .board-wrap{
     display:flex;
     justify-content:center;
+    align-items:stretch;
+    gap:16px;
     margin:6px 0 24px;
   }
+  .digit-tracker{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    width:26px;
+  }
+  .digit-tracker-item{
+    position:relative;
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:6px;
+    transition:opacity .2s,color .2s;
+  }
+  .digit-tracker-item.completed{
+    color:var(--muted);
+    opacity:.45;
+  }
+  .digit-tracker-item.completed::before,
+  .digit-tracker-item.completed::after{
+    content:'';
+    position:absolute;
+    left:12%;
+    right:12%;
+    top:50%;
+    height:2px;
+    background:#e5484d;
+    border-radius:2px;
+  }
+  .digit-tracker-item.completed::before{transform:translateY(-50%) rotate(45deg);}
+  .digit-tracker-item.completed::after{transform:translateY(-50%) rotate(-45deg);}
   .sudoku-grid{
     display:grid;
     grid-template-columns:repeat(9, minmax(28px, 44px));
@@ -354,6 +393,17 @@
     </div>
 
     <div class="board-wrap">
+      <div class="digit-tracker" id="digitTracker">
+        <div class="digit-tracker-item" data-digit="1">1</div>
+        <div class="digit-tracker-item" data-digit="2">2</div>
+        <div class="digit-tracker-item" data-digit="3">3</div>
+        <div class="digit-tracker-item" data-digit="4">4</div>
+        <div class="digit-tracker-item" data-digit="5">5</div>
+        <div class="digit-tracker-item" data-digit="6">6</div>
+        <div class="digit-tracker-item" data-digit="7">7</div>
+        <div class="digit-tracker-item" data-digit="8">8</div>
+        <div class="digit-tracker-item" data-digit="9">9</div>
+      </div>
       <div class="sudoku-grid" id="grid"></div>
     </div>
 
@@ -535,6 +585,20 @@
   const messageEl = document.getElementById('message');
   const solvedCountEl = document.getElementById('solvedCount');
   const diffButtons = document.querySelectorAll('.diff-btn');
+  const digitTrackerItems = document.querySelectorAll('.digit-tracker-item');
+
+  // A digit is "done" once all 9 of its occurrences are locked in (given
+  // clues or confirmed-correct guesses) — struck through so you know you
+  // don't need to keep scanning the board for it.
+  function updateDigitTracker(){
+    const counts = {};
+    gridEl.querySelectorAll('.cell.given, .cell.correct').forEach(cell => {
+      counts[cell.value] = (counts[cell.value] || 0) + 1;
+    });
+    digitTrackerItems.forEach(item => {
+      item.classList.toggle('completed', counts[item.dataset.digit] === 9);
+    });
+  }
 
   function setDifficulty(level){
     difficulty = level;
@@ -567,6 +631,11 @@
   const pencilModeBtn = document.getElementById('pencilModeBtn');
   let pencilModeOn = false;
 
+  // Tapping the button would otherwise blur the focused cell first, which
+  // dismisses the mobile on-screen keyboard. Blocking the default mousedown
+  // behavior keeps the cell (and its keyboard) focused across taps.
+  pencilModeBtn.addEventListener('mousedown', (e) => e.preventDefault());
+
   pencilModeBtn.addEventListener('click', () => {
     pencilModeOn = !pencilModeOn;
     pencilModeBtn.classList.toggle('active', pencilModeOn);
@@ -595,7 +664,10 @@
         const input = document.createElement('input');
         input.type = 'text';
         input.inputMode = 'numeric';
-        input.maxLength = 1;
+        // No maxlength: onCellInput already collapses the value down to the
+        // latest valid digit on every keystroke, which is what lets typing
+        // over an existing (wrong) digit replace it instead of being
+        // blocked because the field looks "full".
         input.autocomplete = 'off';
         input.className = 'cell';
         input.dataset.row = row;
@@ -628,6 +700,7 @@
     }
 
     setMessage('Fill in the missing numbers.');
+    updateDigitTracker();
   }
 
   function onCellInput(e){
@@ -666,6 +739,7 @@
       input.readOnly = true;
       clearCandidates(input);
       removeCandidateFromPeers(row, col, digit);
+      updateDigitTracker();
       checkForWin();
     } else {
       input.classList.add('wrong');
