@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sticky Notes — Free Online Notes App, No Ads</title>
+<meta name="description" content="Free online sticky notes app. Jot down quick notes in colorful cards, saved automatically in your browser. No ads, no sign-up, no account — your notes never leave your device.">
+<meta name="keywords" content="sticky notes, online notes, notes app, quick notes, browser notes, local notes, note taking app">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Jan Korwer">
+<link rel="canonical" href="https://piatek84.github.io/stickynotes.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Sticky Notes — Free Online Notes App, No Ads">
+<meta property="og:description" content="Free online sticky notes app. Jot down quick notes in colorful cards, saved automatically in your browser.">
+<meta property="og:url" content="https://piatek84.github.io/stickynotes.html">
+<meta property="og:site_name" content="Sticky Notes">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Sticky Notes — Free Online Notes App, No Ads">
+<meta name="twitter:description" content="Free online sticky notes app. Jot down quick notes in colorful cards, saved automatically in your browser.">
+
+<meta name="theme-color" content="#0f0f10">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Sticky Notes",
+  "url": "https://piatek84.github.io/stickynotes.html",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Free online sticky notes app. Jot down quick notes in colorful cards, saved automatically in your browser."
+}
+</script>
+
+<style>
+  :root{
+    --bg:#0f0f10;
+    --panel:#1a1a1c;
+    --border:#2c2c2e;
+    --text:#e8e8ea;
+    --muted:#8a8a8e;
+    --max-width:900px;
+  }
+  [data-theme="light"]{
+    --bg:#fafafa;
+    --panel:#ffffff;
+    --border:#e2e2e4;
+    --text:#1a1a1c;
+    --muted:#6b6b6f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:48px 20px 24px;
+    transition:background .2s,color .2s;
+  }
+  .top{
+    width:100%;
+    max-width:var(--max-width);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:24px;
+  }
+  .top-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .toggle{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--muted);
+    border-radius:8px;
+    width:36px;
+    height:36px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    text-decoration:none;
+    flex-shrink:0;
+  }
+  .toggle:hover{color:var(--text);border-color:var(--muted);}
+  h1{
+    margin:0;
+    font-size:18px;
+    font-weight:600;
+    letter-spacing:.2px;
+  }
+  .subtitle{
+    width:100%;
+    max-width:var(--max-width);
+    margin:-10px 0 20px;
+    font-size:13px;
+    color:var(--muted);
+  }
+  main{
+    width:100%;
+    max-width:var(--max-width);
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .add-btn{
+    background:var(--text);
+    color:var(--bg);
+    border:none;
+    border-radius:8px;
+    padding:10px 18px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .add-btn:hover{opacity:.85;}
+  .notes-count{
+    font-size:13px;
+    color:var(--muted);
+  }
+  .notes-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:16px;
+  }
+  .note-card{
+    border-radius:10px;
+    padding:14px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    box-shadow:0 6px 16px rgba(0,0,0,.2);
+    color:#2b2b2b;
+    min-height:150px;
+  }
+  .note-toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .note-colors{
+    display:flex;
+    gap:5px;
+  }
+  .color-dot{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    cursor:pointer;
+    border:1.5px solid rgba(0,0,0,.15);
+    padding:0;
+  }
+  .color-dot.active{
+    box-shadow:0 0 0 2px rgba(0,0,0,.4);
+  }
+  .note-delete{
+    background:none;
+    border:none;
+    color:rgba(0,0,0,.45);
+    font-size:18px;
+    line-height:1;
+    cursor:pointer;
+    padding:2px 6px;
+    border-radius:4px;
+  }
+  .note-delete:hover{
+    color:rgba(0,0,0,.85);
+    background:rgba(0,0,0,.08);
+  }
+  .note-textarea{
+    background:transparent;
+    border:none;
+    outline:none;
+    resize:none;
+    font-family:inherit;
+    font-size:14px;
+    line-height:1.5;
+    color:inherit;
+    min-height:80px;
+    overflow:hidden;
+  }
+  .note-textarea::placeholder{
+    color:rgba(0,0,0,.35);
+  }
+  .note-meta{
+    font-size:11px;
+    color:rgba(0,0,0,.4);
+    text-align:right;
+  }
+  .empty-state{
+    grid-column:1/-1;
+    text-align:center;
+    padding:60px 20px;
+    color:var(--muted);
+    font-size:14px;
+  }
+  .toast{
+    position:fixed;
+    bottom:24px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--panel);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px 16px;
+    font-size:14px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    opacity:0;
+    transition:opacity .2s,transform .2s;
+    pointer-events:none;
+    z-index:999;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);
+  }
+  .toast.visible{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+    pointer-events:auto;
+  }
+  .toast-undo{
+    background:none;
+    border:none;
+    color:var(--text);
+    font-weight:700;
+    cursor:pointer;
+    text-decoration:underline;
+    font-size:14px;
+    padding:0;
+    white-space:nowrap;
+  }
+  .toast-undo:hover{opacity:.8;}
+  footer{
+    width:100%;
+    max-width:var(--max-width);
+    margin-top:40px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .kofi{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:8px 14px;
+    border-radius:999px;
+    color:var(--muted);
+    text-decoration:none;
+    border:1px solid var(--border);
+    font-size:13px;
+    font-weight:500;
+    transition:color .15s,border-color .15s;
+  }
+  .kofi:hover{color:var(--text);border-color:var(--muted);}
+  .kofi svg{width:16px;height:16px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-left">
+    <a class="toggle" href="index.html" title="Back to index">←</a>
+    <h1>Sticky Notes</h1>
+  </div>
+  <button class="toggle" id="themeToggle" title="Toggle theme">🌙</button>
+</div>
+
+<p class="subtitle">Quick colorful notes, saved automatically in your browser — free, fast, and private. Nothing is ever uploaded.</p>
+
+<main>
+  <div class="toolbar">
+    <button class="add-btn" id="addBtn">+ New Note</button>
+    <span class="notes-count" id="notesCount"></span>
+  </div>
+
+  <div class="notes-grid" id="notesGrid"></div>
+</main>
+
+<div class="toast" id="toastEl">
+  <span>Note deleted</span>
+  <button class="toast-undo" id="toastUndoBtn">Undo</button>
+</div>
+
+<footer>
+  <a class="kofi" href="https://ko-fi.com/jankorwer" target="_blank" rel="noopener" title="Buy me a coffee">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="13.2" y1="2" x2="11.7" y2="6"/>
+      <rect x="5" y="6" width="14" height="3" rx="1.4"/>
+      <path d="M6 9 L7 20 Q7.2 21 8.2 21 L15.8 21 Q16.8 21 17 20 L18 9 Z"/>
+      <line x1="6.7" y1="14" x2="17.3" y2="14"/>
+    </svg>
+    Buy me a coffee
+  </a>
+</footer>
+
+<script>
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const saved = localStorage.getItem('theme') || 'dark';
+  applyTheme(saved);
+
+  themeToggle.addEventListener('click', () => {
+    const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const next = current === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+    localStorage.setItem('theme', next);
+  });
+
+  function applyTheme(theme){
+    if(theme === 'light'){
+      root.setAttribute('data-theme','light');
+      themeToggle.textContent = '☀️';
+    } else {
+      root.removeAttribute('data-theme');
+      themeToggle.textContent = '🌙';
+    }
+  }
+</script>
+
+<script>
+  const STORAGE_KEY = 'stickyNotes';
+  const COLORS = [
+    { id:'yellow', bg:'#fdf2a1' },
+    { id:'pink',   bg:'#fbd3e0' },
+    { id:'blue',   bg:'#cfe8fb' },
+    { id:'green',  bg:'#d7f0d0' },
+    { id:'purple', bg:'#e4d6fb' },
+    { id:'orange', bg:'#fde0c2' }
+  ];
+
+  const addBtn = document.getElementById('addBtn');
+  const gridEl = document.getElementById('notesGrid');
+  const notesCountEl = document.getElementById('notesCount');
+  const toastEl = document.getElementById('toastEl');
+  const toastUndoBtn = document.getElementById('toastUndoBtn');
+
+  function loadNotes(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch(e) {
+      return [];
+    }
+  }
+
+  function saveNotes(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+  }
+
+  let notes = loadNotes();
+
+  function uid(){
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  function rotationForId(id){
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+    return (hash % 5) - 2; // -2deg .. 2deg
+  }
+
+  function formatRelativeTime(ts){
+    const diff = Date.now() - ts;
+    const min = Math.floor(diff / 60000);
+    if (min < 1) return 'just now';
+    if (min < 60) return `${min}m ago`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr}h ago`;
+    const day = Math.floor(hr / 24);
+    return `${day}d ago`;
+  }
+
+  function autoGrow(textarea){
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  }
+
+  function addNote(){
+    const note = {
+      id: uid(),
+      text: '',
+      color: COLORS[Math.floor(Math.random() * COLORS.length)].id,
+      updatedAt: Date.now()
+    };
+    notes.unshift(note);
+    saveNotes();
+    render();
+    requestAnimationFrame(() => {
+      const ta = gridEl.querySelector(`[data-id="${note.id}"] textarea`);
+      if (ta) ta.focus();
+    });
+  }
+
+  let pendingUndo = null;
+
+  function deleteNote(id){
+    const index = notes.findIndex(n => n.id === id);
+    if (index === -1) return;
+    const note = notes[index];
+    notes.splice(index, 1);
+    saveNotes();
+    render();
+    if (note.text.trim()) showUndoToast(note, index);
+  }
+
+  function showUndoToast(note, index){
+    clearTimeout(pendingUndo && pendingUndo.timer);
+    pendingUndo = { note, index };
+    toastEl.classList.add('visible');
+    pendingUndo.timer = setTimeout(hideToast, 12000);
+  }
+
+  function hideToast(){
+    clearTimeout(pendingUndo && pendingUndo.timer);
+    pendingUndo = null;
+    toastEl.classList.remove('visible');
+  }
+
+  function undoDelete(){
+    if (!pendingUndo) return;
+    notes.splice(pendingUndo.index, 0, pendingUndo.note);
+    saveNotes();
+    render();
+    hideToast();
+  }
+
+  function updateNoteText(id, text){
+    const note = notes.find(n => n.id === id);
+    if (!note) return;
+    note.text = text;
+    note.updatedAt = Date.now();
+    saveNotes();
+  }
+
+  function updateNoteColor(id, colorId){
+    const note = notes.find(n => n.id === id);
+    if (!note) return;
+    note.color = colorId;
+    note.updatedAt = Date.now();
+    saveNotes();
+    render();
+  }
+
+  function render(){
+    notesCountEl.textContent = notes.length ? `${notes.length} note${notes.length === 1 ? '' : 's'}` : '';
+
+    if (notes.length === 0) {
+      gridEl.innerHTML = '<div class="empty-state">No notes yet. Click "+ New Note" to add one.</div>';
+      return;
+    }
+
+    gridEl.innerHTML = '';
+    notes.forEach(note => {
+      const color = COLORS.find(c => c.id === note.color) || COLORS[0];
+
+      const card = document.createElement('div');
+      card.className = 'note-card';
+      card.dataset.id = note.id;
+      card.style.background = color.bg;
+      card.style.transform = `rotate(${rotationForId(note.id)}deg)`;
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'note-toolbar';
+
+      const colorsWrap = document.createElement('div');
+      colorsWrap.className = 'note-colors';
+      COLORS.forEach(c => {
+        const dot = document.createElement('button');
+        dot.className = 'color-dot' + (c.id === note.color ? ' active' : '');
+        dot.style.background = c.bg;
+        dot.title = c.id;
+        dot.addEventListener('click', () => updateNoteColor(note.id, c.id));
+        colorsWrap.appendChild(dot);
+      });
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'note-delete';
+      delBtn.textContent = '×';
+      delBtn.title = 'Delete note';
+      delBtn.addEventListener('click', () => deleteNote(note.id));
+
+      toolbar.appendChild(colorsWrap);
+      toolbar.appendChild(delBtn);
+
+      const textarea = document.createElement('textarea');
+      textarea.className = 'note-textarea';
+      textarea.placeholder = 'Type a note…';
+      textarea.value = note.text;
+
+      const meta = document.createElement('div');
+      meta.className = 'note-meta';
+      meta.textContent = formatRelativeTime(note.updatedAt);
+
+      textarea.addEventListener('input', () => {
+        updateNoteText(note.id, textarea.value);
+        autoGrow(textarea);
+        meta.textContent = formatRelativeTime(note.updatedAt);
+      });
+
+      card.appendChild(toolbar);
+      card.appendChild(textarea);
+      card.appendChild(meta);
+      gridEl.appendChild(card);
+
+      autoGrow(textarea);
+    });
+  }
+
+  addBtn.addEventListener('click', addNote);
+  toastUndoBtn.addEventListener('click', undoDelete);
+
+  render();
+</script>
+
+<script>
+  // Double-click anywhere to toggle fullscreen (double-click again to exit).
+  // Needs a fast double-click on a non-interactive element, so selecting text
+  // or clicking a button/input doesn't accidentally trigger fullscreen.
+  let lastClickTime = 0;
+  let lastClickTarget = null;
+  document.addEventListener('click', (e) => {
+    if(e.target.closest('a, button, input, textarea, select, label, [contenteditable]')){
+      lastClickTime = 0;
+      return;
+    }
+    const now = Date.now();
+    if(now - lastClickTime < 300 && lastClickTarget === e.target){
+      lastClickTime = 0;
+      if(!document.fullscreenElement && !document.webkitFullscreenElement &&
+         !document.mozFullScreenElement && !document.msFullscreenElement){
+        const elem = document.documentElement;
+        if(elem.requestFullscreen) elem.requestFullscreen();
+        else if(elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+        else if(elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+        else if(elem.msRequestFullscreen) elem.msRequestFullscreen();
+      } else {
+        if(document.exitFullscreen) document.exitFullscreen();
+        else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if(document.mozCancelFullScreen) document.mozCancelFullScreen();
+        else if(document.msExitFullscreen) document.msExitFullscreen();
+      }
+    } else {
+      lastClickTime = now;
+      lastClickTarget = e.target;
+    }
+  });
+</script>
+
+</body>
+</html>

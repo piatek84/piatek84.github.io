@@ -1461,7 +1461,24 @@
                 document.getElementById('fullscreenBtn').addEventListener('click', () => this.toggle());
 
                 // Double-click anywhere to toggle fullscreen too (double-click again to exit).
-                document.addEventListener('dblclick', () => this.toggle());
+                // Needs a fast double-click on a non-interactive element, so selecting text
+                // or clicking a button/input doesn't accidentally trigger fullscreen.
+                let lastFsClickTime = 0;
+                let lastFsClickTarget = null;
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('a, button, input, textarea, select, label, [contenteditable]')) {
+                        lastFsClickTime = 0;
+                        return;
+                    }
+                    const now = Date.now();
+                    if (now - lastFsClickTime < 300 && lastFsClickTarget === e.target) {
+                        lastFsClickTime = 0;
+                        this.toggle();
+                    } else {
+                        lastFsClickTime = now;
+                        lastFsClickTarget = e.target;
+                    }
+                });
 
                 // Listen for fullscreen changes
                 document.addEventListener('fullscreenchange', () => this.updateIcon());

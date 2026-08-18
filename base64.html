@@ -299,19 +299,34 @@
 
 <script>
   // Double-click anywhere to toggle fullscreen (double-click again to exit).
-  document.addEventListener('dblclick', () => {
-    if(!document.fullscreenElement && !document.webkitFullscreenElement &&
-       !document.mozFullScreenElement && !document.msFullscreenElement){
-      const elem = document.documentElement;
-      if(elem.requestFullscreen) elem.requestFullscreen();
-      else if(elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-      else if(elem.mozRequestFullScreen) elem.mozRequestFullScreen();
-      else if(elem.msRequestFullscreen) elem.msRequestFullscreen();
+  // Needs a fast double-click on a non-interactive element, so selecting text
+  // or clicking a button/input doesn't accidentally trigger fullscreen.
+  let lastClickTime = 0;
+  let lastClickTarget = null;
+  document.addEventListener('click', (e) => {
+    if(e.target.closest('a, button, input, textarea, select, label, [contenteditable]')){
+      lastClickTime = 0;
+      return;
+    }
+    const now = Date.now();
+    if(now - lastClickTime < 300 && lastClickTarget === e.target){
+      lastClickTime = 0;
+      if(!document.fullscreenElement && !document.webkitFullscreenElement &&
+         !document.mozFullScreenElement && !document.msFullscreenElement){
+        const elem = document.documentElement;
+        if(elem.requestFullscreen) elem.requestFullscreen();
+        else if(elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+        else if(elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+        else if(elem.msRequestFullscreen) elem.msRequestFullscreen();
+      } else {
+        if(document.exitFullscreen) document.exitFullscreen();
+        else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if(document.mozCancelFullScreen) document.mozCancelFullScreen();
+        else if(document.msExitFullscreen) document.msExitFullscreen();
+      }
     } else {
-      if(document.exitFullscreen) document.exitFullscreen();
-      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
-      else if(document.mozCancelFullScreen) document.mozCancelFullScreen();
-      else if(document.msExitFullscreen) document.msExitFullscreen();
+      lastClickTime = now;
+      lastClickTarget = e.target;
     }
   });
 </script>

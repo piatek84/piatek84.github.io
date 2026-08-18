@@ -3,24 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pomodoro Timer Online — Free, Fast, No Ads</title>
-<meta name="description" content="Free online Pomodoro timer. Stay focused with work and break intervals, right in your browser. No ads, no sign-up, minimalist and private.">
-<meta name="keywords" content="pomodoro, pomodoro timer, focus timer, productivity timer, online pomodoro, work timer, break timer">
+<title>Countdown Timer Online — Free, Fast, No Ads</title>
+<meta name="description" content="Free online countdown timer. Set hours, minutes, and seconds and get an alarm when time's up, right in your browser. No ads, no sign-up, minimalist and private.">
+<meta name="keywords" content="timer, countdown timer, online timer, kitchen timer, alarm timer, set timer">
 <meta name="robots" content="index, follow">
 <meta name="author" content="Jan Korwer">
-<link rel="canonical" href="https://piatek84.github.io/pomodoro.html">
+<link rel="canonical" href="https://piatek84.github.io/timer.html">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="Pomodoro Timer Online — Free, Fast, No Ads">
-<meta property="og:description" content="Free online Pomodoro timer. Stay focused with work and break intervals, right in your browser.">
-<meta property="og:url" content="https://piatek84.github.io/pomodoro.html">
-<meta property="og:site_name" content="Pomodoro Timer">
+<meta property="og:title" content="Countdown Timer Online — Free, Fast, No Ads">
+<meta property="og:description" content="Free online countdown timer. Set hours, minutes, and seconds and get an alarm when time's up, right in your browser.">
+<meta property="og:url" content="https://piatek84.github.io/timer.html">
+<meta property="og:site_name" content="Countdown Timer">
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Pomodoro Timer Online — Free, Fast, No Ads">
-<meta name="twitter:description" content="Free online Pomodoro timer. Stay focused with work and break intervals, right in your browser.">
+<meta name="twitter:title" content="Countdown Timer Online — Free, Fast, No Ads">
+<meta name="twitter:description" content="Free online countdown timer. Set hours, minutes, and seconds and get an alarm when time's up, right in your browser.">
 
 <meta name="theme-color" content="#0f0f10">
 
@@ -28,8 +28,8 @@
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "Pomodoro Timer",
-  "url": "https://piatek84.github.io/pomodoro.html",
+  "name": "Countdown Timer",
+  "url": "https://piatek84.github.io/timer.html",
   "applicationCategory": "UtilitiesApplication",
   "operatingSystem": "Any",
   "offers": {
@@ -37,7 +37,7 @@
     "price": "0",
     "priceCurrency": "USD"
   },
-  "description": "Free online Pomodoro timer. Stay focused with work and break intervals, right in your browser."
+  "description": "Free online countdown timer. Set hours, minutes, and seconds and get an alarm when time's up, right in your browser."
 }
 </script>
 
@@ -125,28 +125,6 @@
     flex-direction:column;
     gap:14px;
   }
-  .modes{
-    display:flex;
-    gap:8px;
-    justify-content:center;
-  }
-  .mode-btn{
-    background:none;
-    border:1px solid var(--border);
-    color:var(--muted);
-    border-radius:999px;
-    padding:7px 16px;
-    font-size:13px;
-    font-weight:500;
-    cursor:pointer;
-    transition:color .15s,border-color .15s,background .15s;
-  }
-  .mode-btn:hover{color:var(--text);border-color:var(--muted);}
-  .mode-btn.active{
-    background:var(--text);
-    color:var(--bg);
-    border-color:var(--text);
-  }
   .timer-panel{
     background:var(--panel);
     border:1px solid var(--border);
@@ -159,7 +137,7 @@
   }
   .time{
     font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-    font-size:64px;
+    font-size:56px;
     font-weight:600;
     letter-spacing:1px;
     font-variant-numeric:tabular-nums;
@@ -177,10 +155,6 @@
     background:var(--text);
     border-radius:999px;
     transition:width .3s linear;
-  }
-  .session-count{
-    font-size:12px;
-    color:var(--muted);
   }
   .buttons{
     display:flex;
@@ -203,6 +177,7 @@
     color:var(--text);
     border:1px solid var(--border);
   }
+  button.action:disabled{opacity:.5;cursor:default;}
   .settings{
     background:var(--panel);
     border:1px solid var(--border);
@@ -234,6 +209,25 @@
     outline:none;
   }
   .settings-row input[type="number"]:focus{border-color:var(--muted);}
+  .presets{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .preset-btn{
+    flex:1;
+    min-width:60px;
+    background:none;
+    border:1px solid var(--border);
+    color:var(--muted);
+    border-radius:999px;
+    padding:7px 12px;
+    font-size:12px;
+    font-weight:500;
+    cursor:pointer;
+    transition:color .15s,border-color .15s;
+  }
+  .preset-btn:hover{color:var(--text);border-color:var(--muted);}
   footer{
     width:100%;
     max-width:480px;
@@ -263,26 +257,19 @@
 <div class="top">
   <div class="top-left">
     <a class="toggle" href="index.html" title="Back to index">←</a>
-    <h1>Pomodoro</h1>
+    <h1>Timer</h1>
   </div>
   <button class="toggle" id="themeToggle" title="Toggle theme">🌙</button>
 </div>
 
-<p class="subtitle">Focus timer with work and break intervals — free, fast, and private.</p>
+<p class="subtitle">Set a countdown and get an alarm when it's done — free, fast, and private.</p>
 
 <main>
-  <div class="modes">
-    <button class="mode-btn active" data-mode="work">Focus</button>
-    <button class="mode-btn" data-mode="short">Short break</button>
-    <button class="mode-btn" data-mode="long">Long break</button>
-  </div>
-
   <div class="timer-panel">
-    <div class="time" id="time">25:00</div>
+    <div class="time" id="time">00:05:00</div>
     <div class="progress-wrap">
       <div class="progress-bar" id="progressBar"></div>
     </div>
-    <div class="session-count" id="sessionCount">Sessions completed: 0</div>
     <div class="buttons">
       <button class="action" id="startBtn">Start</button>
       <button class="action secondary" id="resetBtn">Reset</button>
@@ -291,16 +278,24 @@
 
   <div class="settings">
     <div class="settings-row">
-      <label for="workInput">Focus (minutes)</label>
-      <input type="number" id="workInput" min="1" max="180" value="25">
+      <label for="hoursInput">Hours</label>
+      <input type="number" id="hoursInput" min="0" max="99" value="0">
     </div>
     <div class="settings-row">
-      <label for="shortInput">Short break (minutes)</label>
-      <input type="number" id="shortInput" min="1" max="60" value="5">
+      <label for="minutesInput">Minutes</label>
+      <input type="number" id="minutesInput" min="0" max="59" value="5">
     </div>
     <div class="settings-row">
-      <label for="longInput">Long break (minutes)</label>
-      <input type="number" id="longInput" min="1" max="90" value="15">
+      <label for="secondsInput">Seconds</label>
+      <input type="number" id="secondsInput" min="0" max="59" value="0">
+    </div>
+    <div class="presets">
+      <button class="preset-btn" data-seconds="60">1 min</button>
+      <button class="preset-btn" data-seconds="300">5 min</button>
+      <button class="preset-btn" data-seconds="600">10 min</button>
+      <button class="preset-btn" data-seconds="900">15 min</button>
+      <button class="preset-btn" data-seconds="1800">30 min</button>
+      <button class="preset-btn" data-seconds="3600">1 hr</button>
     </div>
   </div>
 </main>
@@ -339,23 +334,31 @@
       themeToggle.textContent = '🌙';
     }
   }
+</script>
 
+<script>
   const timeEl = document.getElementById('time');
   const progressBar = document.getElementById('progressBar');
   const startBtn = document.getElementById('startBtn');
   const resetBtn = document.getElementById('resetBtn');
-  const sessionCountEl = document.getElementById('sessionCount');
-  const modeButtons = document.querySelectorAll('.mode-btn');
-  const workInput = document.getElementById('workInput');
-  const shortInput = document.getElementById('shortInput');
-  const longInput = document.getElementById('longInput');
+  const hoursInput = document.getElementById('hoursInput');
+  const minutesInput = document.getElementById('minutesInput');
+  const secondsInput = document.getElementById('secondsInput');
 
-  let mode = 'work';
-  let sessionsCompleted = 0;
-  let totalSeconds = getDurationForMode(mode) * 60;
+  function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+
+  function getConfiguredSeconds(){
+    const h = clamp(parseInt(hoursInput.value, 10) || 0, 0, 99);
+    const m = clamp(parseInt(minutesInput.value, 10) || 0, 0, 59);
+    const s = clamp(parseInt(secondsInput.value, 10) || 0, 0, 59);
+    return h * 3600 + m * 60 + s;
+  }
+
+  let totalSeconds = getConfiguredSeconds();
   let remainingSeconds = totalSeconds;
   let running = false;
   let endTime = null;
+  let showHours = totalSeconds >= 3600;
 
   const tickerWorker = (() => {
     const workerCode = `
@@ -374,34 +377,20 @@
   })();
   tickerWorker.onmessage = () => { if(running) tick(); };
 
-  function getDurationForMode(m){
-    if(m === 'work') return parseInt(workInput.value, 10) || 25;
-    if(m === 'short') return parseInt(shortInput.value, 10) || 5;
-    return parseInt(longInput.value, 10) || 15;
-  }
+  function pad(n){ return String(n).padStart(2, '0'); }
 
   function formatTime(seconds){
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = Math.floor(seconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    return showHours ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
   }
 
   function updateDisplay(){
     timeEl.textContent = formatTime(remainingSeconds);
     const pct = totalSeconds > 0 ? ((totalSeconds - remainingSeconds) / totalSeconds) * 100 : 0;
     progressBar.style.width = pct + '%';
-    document.title = running ? `${formatTime(remainingSeconds)} — Pomodoro` : 'Pomodoro Timer Online — Free, Fast, No Ads';
-  }
-
-  function switchMode(newMode, resetTimer = true){
-    mode = newMode;
-    modeButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
-    if(resetTimer){
-      pause();
-      totalSeconds = getDurationForMode(mode) * 60;
-      remainingSeconds = totalSeconds;
-      updateDisplay();
-    }
+    document.title = running ? `${formatTime(remainingSeconds)} — Timer` : 'Countdown Timer Online — Free, Fast, No Ads';
   }
 
   function tick(){
@@ -409,20 +398,48 @@
     updateDisplay();
     if(remainingSeconds <= 0){
       pause();
-      handleSessionComplete();
+      handleComplete();
     }
   }
 
-  function handleSessionComplete(){
-    if(mode === 'work'){
-      sessionsCompleted++;
-      sessionCountEl.textContent = `Sessions completed: ${sessionsCompleted}`;
-      const nextMode = sessionsCompleted % 4 === 0 ? 'long' : 'short';
-      switchMode(nextMode);
-    } else {
-      switchMode('work');
-    }
+  function handleComplete(){
     playChime();
+    document.title = "⏰ Time's up! — Timer";
+    showToast("⏰ Time's up!");
+  }
+
+  let toastEl = null;
+  let toastTimer = null;
+  function showToast(message){
+    if(!toastEl){
+      toastEl = document.createElement('div');
+      toastEl.style.position = 'fixed';
+      toastEl.style.bottom = '24px';
+      toastEl.style.left = '50%';
+      toastEl.style.transform = 'translateX(-50%) translateY(20px)';
+      toastEl.style.background = 'var(--panel)';
+      toastEl.style.color = 'var(--text)';
+      toastEl.style.border = '1px solid var(--border)';
+      toastEl.style.borderRadius = '10px';
+      toastEl.style.padding = '12px 20px';
+      toastEl.style.fontSize = '14px';
+      toastEl.style.fontWeight = '600';
+      toastEl.style.opacity = '0';
+      toastEl.style.transition = 'opacity .2s, transform .2s';
+      toastEl.style.pointerEvents = 'none';
+      toastEl.style.zIndex = '999';
+      document.body.appendChild(toastEl);
+    }
+    toastEl.textContent = message;
+    requestAnimationFrame(() => {
+      toastEl.style.opacity = '1';
+      toastEl.style.transform = 'translateX(-50%) translateY(0)';
+    });
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toastEl.style.opacity = '0';
+      toastEl.style.transform = 'translateX(-50%) translateY(20px)';
+    }, 4000);
   }
 
   function playChime(){
@@ -432,10 +449,30 @@
       masterGain.gain.value = 0.9;
       masterGain.connect(ctx.destination);
 
-      const notes = [880, 1108.73, 1318.51];
+      const notes = [880, 1108.73, 1318.51, 1760];
       notes.forEach((freq, i) => {
-        const startTime = ctx.currentTime + i * 0.16;
-        const duration = 0.9;
+        const startTime = ctx.currentTime + i * 0.18;
+        const duration = 1.0;
+
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(masterGain);
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+
+        gain.gain.setValueAtTime(0, startTime);
+        gain.gain.linearRampToValueAtTime(0.5, startTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      });
+
+      // Repeat the chime once more so it's hard to miss
+      notes.forEach((freq, i) => {
+        const startTime = ctx.currentTime + 1.4 + i * 0.18;
+        const duration = 1.0;
 
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -494,6 +531,12 @@
 
   function start(){
     if(running) return;
+    if(remainingSeconds <= 0){
+      totalSeconds = getConfiguredSeconds();
+      if(totalSeconds <= 0) return;
+      showHours = totalSeconds >= 3600;
+      remainingSeconds = totalSeconds;
+    }
     running = true;
     startBtn.textContent = 'Pause';
     endTime = Date.now() + remainingSeconds * 1000;
@@ -522,22 +565,34 @@
 
   resetBtn.addEventListener('click', () => {
     pause();
-    totalSeconds = getDurationForMode(mode) * 60;
+    totalSeconds = getConfiguredSeconds();
+    showHours = totalSeconds >= 3600;
     remainingSeconds = totalSeconds;
     updateDisplay();
   });
 
-  modeButtons.forEach(btn => {
-    btn.addEventListener('click', () => switchMode(btn.dataset.mode));
-  });
-
-  [workInput, shortInput, longInput].forEach(input => {
+  [hoursInput, minutesInput, secondsInput].forEach(input => {
     input.addEventListener('change', () => {
-      if(!running && input === (mode === 'work' ? workInput : mode === 'short' ? shortInput : longInput)){
-        totalSeconds = getDurationForMode(mode) * 60;
+      if(!running){
+        totalSeconds = getConfiguredSeconds();
+        showHours = totalSeconds >= 3600;
         remainingSeconds = totalSeconds;
         updateDisplay();
       }
+    });
+  });
+
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(running) pause();
+      const seconds = parseInt(btn.dataset.seconds, 10);
+      hoursInput.value = Math.floor(seconds / 3600);
+      minutesInput.value = Math.floor((seconds % 3600) / 60);
+      secondsInput.value = seconds % 60;
+      totalSeconds = seconds;
+      showHours = totalSeconds >= 3600;
+      remainingSeconds = totalSeconds;
+      updateDisplay();
     });
   });
 

@@ -1337,9 +1337,53 @@
                 this.sidebarToggle.addEventListener('click', () => this.toggleSidebar());
                 this.themeToggle.addEventListener('click', () => this.toggleTheme());
                 this.overlayBackdrop.addEventListener('click', () => this.closeSidebar());
-                document.addEventListener('dblclick', () => this.toggleFullscreen());
+                // Needs a fast double-click on a non-interactive element, so selecting text
+                // or clicking a button/input doesn't accidentally trigger fullscreen.
+                let lastFsClickTime = 0;
+                let lastFsClickTarget = null;
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('a, button, input, textarea, select, label, [contenteditable]')) {
+                        lastFsClickTime = 0;
+                        return;
+                    }
+                    const now = Date.now();
+                    if (now - lastFsClickTime < 300 && lastFsClickTarget === e.target) {
+                        lastFsClickTime = 0;
+                        this.toggleFullscreen();
+                    } else {
+                        lastFsClickTime = now;
+                        lastFsClickTarget = e.target;
+                    }
+                });
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape' && !this.sidebarCollapsed) this.closeSidebar();
+
+                    const tag = (e.target.tagName || '').toLowerCase();
+                    const isFormField = tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable;
+                    if (isFormField) return;
+
+                    switch (e.key) {
+                        case ' ':
+                            e.preventDefault();
+                            this.togglePlay();
+                            break;
+                        case 'ArrowRight':
+                            e.preventDefault();
+                            this.nextStation();
+                            break;
+                        case 'ArrowLeft':
+                            e.preventDefault();
+                            this.previousStation();
+                            break;
+                        case 'ArrowUp':
+                            e.preventDefault();
+                            this.adjustVolume(5);
+                            break;
+                        case 'ArrowDown':
+                            e.preventDefault();
+                            this.adjustVolume(-5);
+                            break;
+                    }
                 });
 
                 // Progress bar events
@@ -1631,6 +1675,12 @@
 
             setVolume(value) {
                 this.audio.volume = value / 100;
+            }
+
+            adjustVolume(delta) {
+                const newValue = Math.min(100, Math.max(0, parseInt(this.volumeSlider.value, 10) + delta));
+                this.volumeSlider.value = newValue;
+                this.setVolume(newValue);
             }
 
             formatTime(seconds) {
