@@ -122,8 +122,12 @@
   .toolbar{
     display:flex;
     align-items:center;
-    justify-content:space-between;
+    justify-content:center;
     gap:12px;
+  }
+  .add-row{
+    display:flex;
+    justify-content:center;
   }
   .add-btn{
     background:var(--text);
@@ -291,11 +295,14 @@
 
 <main>
   <div class="toolbar">
-    <button class="add-btn" id="addBtn">+ New Note</button>
     <span class="notes-count" id="notesCount"></span>
   </div>
 
   <div class="notes-grid" id="notesGrid"></div>
+
+  <div class="add-row">
+    <button class="add-btn" id="addBtn">+ New Note</button>
+  </div>
 </main>
 
 <div class="toast" id="toastEl">
@@ -405,7 +412,7 @@
       color: COLORS[Math.floor(Math.random() * COLORS.length)].id,
       updatedAt: Date.now()
     };
-    notes.unshift(note);
+    notes.push(note);
     saveNotes();
     render();
     requestAnimationFrame(() => {

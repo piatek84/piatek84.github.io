@@ -483,6 +483,24 @@
         .toast.visible {
             opacity: 1;
             transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .toast-undo-btn {
+            display: inline;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 13px;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 10px;
+        }
+
+        .toast-undo-btn:hover {
+            opacity: 0.8;
         }
 
         body.fullscreen {
@@ -1245,12 +1263,39 @@
                 toastEl.className = 'toast';
                 document.body.appendChild(toastEl);
             }
+            toastEl.innerHTML = '';
             toastEl.textContent = message;
             toastEl.classList.remove('visible');
             void toastEl.offsetWidth; // restart the transition if it's already showing
             toastEl.classList.add('visible');
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => toastEl.classList.remove('visible'), 2000);
+        }
+
+        function showUndoToast(message, onUndo) {
+            if (!toastEl) {
+                toastEl = document.createElement('div');
+                toastEl.className = 'toast';
+                document.body.appendChild(toastEl);
+            }
+            toastEl.innerHTML = '';
+            const msgSpan = document.createElement('span');
+            msgSpan.textContent = message;
+            const undoBtn = document.createElement('button');
+            undoBtn.className = 'toast-undo-btn';
+            undoBtn.textContent = 'Undo';
+            undoBtn.addEventListener('click', () => {
+                clearTimeout(toastTimer);
+                toastEl.classList.remove('visible');
+                onUndo();
+            });
+            toastEl.appendChild(msgSpan);
+            toastEl.appendChild(undoBtn);
+            toastEl.classList.remove('visible');
+            void toastEl.offsetWidth;
+            toastEl.classList.add('visible');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toastEl.classList.remove('visible'), 12000);
         }
 
         class RadioPlayer {
@@ -1597,19 +1642,33 @@
             }
 
             deleteStation(index) {
-                if (confirm(`Delete "${this.stations[index].title}"?`)) {
-                    if (this.currentStation === index) {
-                        this.stop();
-                        this.currentStation = null;
-                    } else if (this.currentStation > index) {
-                        this.currentStation--;
+                const station = this.stations[index];
+                const wasCurrentStation = this.currentStation === index;
+
+                if (wasCurrentStation) {
+                    this.stop();
+                    this.currentStation = null;
+                } else if (this.currentStation > index) {
+                    this.currentStation--;
+                }
+                this.stations.splice(index, 1);
+                this.saveStations();
+                this.renderStations();
+                this.updateDisplay();
+                this.updateNavigationButtons();
+
+                showUndoToast(`Deleted "${station.title}"`, () => {
+                    this.stations.splice(index, 0, station);
+                    if (wasCurrentStation) {
+                        this.currentStation = index;
+                    } else if (this.currentStation !== null && this.currentStation >= index) {
+                        this.currentStation++;
                     }
-                    this.stations.splice(index, 1);
                     this.saveStations();
                     this.renderStations();
                     this.updateDisplay();
                     this.updateNavigationButtons();
-                }
+                });
             }
 
             selectStation(index, autoPlay = false) {
