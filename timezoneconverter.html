@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timezone Converter — Free UTC & World Clock Converter</title>
+<meta name="description" content="Free online timezone converter. Convert any date and time between two timezones (including UTC) in both directions, starting from the current time. No ads, no sign-up, runs entirely in your browser.">
+<meta name="keywords" content="timezone converter, utc converter, utc to local time, time zone converter, convert time between timezones, world clock">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Jan Korwer">
+<link rel="canonical" href="https://piatek84.github.io/timezoneconverter.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Timezone Converter — Free UTC & World Clock Converter">
+<meta property="og:description" content="Free online timezone converter. Convert any date and time between two timezones (including UTC) in both directions, starting from the current time.">
+<meta property="og:url" content="https://piatek84.github.io/timezoneconverter.html">
+<meta property="og:site_name" content="Timezone Converter">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Timezone Converter — Free UTC & World Clock Converter">
+<meta name="twitter:description" content="Free online timezone converter. Convert any date and time between two timezones (including UTC) in both directions, starting from the current time.">
+
+<meta name="theme-color" content="#0f0f10">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Timezone Converter",
+  "url": "https://piatek84.github.io/timezoneconverter.html",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Free online timezone converter. Convert any date and time between two timezones (including UTC) in both directions, starting from the current time."
+}
+</script>
+
+<style>
+  :root{
+    --bg:#0f0f10;
+    --panel:#1a1a1c;
+    --border:#2c2c2e;
+    --text:#e8e8ea;
+    --muted:#8a8a8e;
+    --accent:#e8e8ea;
+  }
+  [data-theme="light"]{
+    --bg:#fafafa;
+    --panel:#ffffff;
+    --border:#e2e2e4;
+    --text:#1a1a1c;
+    --muted:#6b6b6f;
+    --accent:#1a1a1c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:48px 20px 24px;
+    transition:background .2s,color .2s;
+    color-scheme: dark;
+  }
+  [data-theme="light"] body{ color-scheme: light; }
+  .top{
+    width:100%;
+    max-width:480px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:24px;
+  }
+  .top-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .toggle{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--muted);
+    border-radius:8px;
+    width:36px;
+    height:36px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    text-decoration:none;
+  }
+  .toggle:hover{color:var(--text);border-color:var(--muted);}
+  h1{
+    margin:0;
+    font-size:18px;
+    font-weight:600;
+    letter-spacing:.2px;
+  }
+  .subtitle{
+    width:100%;
+    max-width:480px;
+    margin:-10px 0 20px;
+    font-size:13px;
+    color:var(--muted);
+  }
+  main{
+    width:100%;
+    max-width:480px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .field-label{
+    font-size:13px;
+    color:var(--muted);
+    font-weight:500;
+  }
+  select.zone-select{
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:11px 12px;
+    font-size:14px;
+    outline:none;
+    font-family:inherit;
+  }
+  select.zone-select:focus{border-color:var(--muted);}
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .dt-field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .dt-field label{
+    font-size:13px;
+    color:var(--muted);
+    font-weight:500;
+  }
+  .dt-field input[type="datetime-local"]{
+    background:var(--bg);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:14px;
+    outline:none;
+    font-family:inherit;
+    width:100%;
+  }
+  .dt-field input[type="datetime-local"]:focus{border-color:var(--muted);}
+  .zone-offset{
+    font-size:12px;
+    color:var(--muted);
+  }
+  .zone-offset strong{color:var(--text);}
+  .swap-row{
+    display:flex;
+    justify-content:center;
+  }
+  .swap-btn{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--muted);
+    border-radius:999px;
+    padding:6px 16px;
+    font-size:13px;
+    font-weight:500;
+    cursor:pointer;
+  }
+  .swap-btn:hover{color:var(--text);border-color:var(--muted);}
+  .diff-info{
+    text-align:center;
+    font-size:13px;
+    color:var(--muted);
+    padding-top:10px;
+    border-top:1px solid var(--border);
+  }
+  .diff-info strong{color:var(--text);}
+  button.action{
+    background:var(--text);
+    color:var(--bg);
+    border:none;
+    border-radius:8px;
+    padding:12px 22px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    width:100%;
+  }
+  button.action:hover{opacity:.85;}
+  button.action.secondary{
+    background:none;
+    color:var(--text);
+    border:1px solid var(--border);
+  }
+  footer{
+    width:100%;
+    max-width:480px;
+    margin-top:40px;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .kofi{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:8px 14px;
+    border-radius:999px;
+    color:var(--muted);
+    text-decoration:none;
+    border:1px solid var(--border);
+    font-size:13px;
+    font-weight:500;
+    transition:color .15s,border-color .15s;
+  }
+  .kofi:hover{color:var(--text);border-color:var(--muted);}
+  .kofi svg{width:16px;height:16px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-left">
+    <a class="toggle" href="index.html" title="Back to index">←</a>
+    <h1>Timezone Converter</h1>
+  </div>
+  <button class="toggle" id="themeToggle" title="Toggle theme">🌙</button>
+</div>
+
+<p class="subtitle">Convert between any two timezones, in both directions — free, fast, and private. Starts at the current time; edit either field manually.</p>
+
+<main>
+  <div class="panel">
+    <div class="dt-field">
+      <label for="zoneASelect">From</label>
+      <select class="zone-select" id="zoneASelect"></select>
+      <input type="datetime-local" id="zoneAInput">
+      <div class="zone-offset" id="offsetAEl"></div>
+    </div>
+
+    <div class="swap-row">
+      <button class="swap-btn" id="swapBtn" title="Swap timezones">⇅ Swap</button>
+    </div>
+
+    <div class="dt-field">
+      <label for="zoneBSelect">To</label>
+      <select class="zone-select" id="zoneBSelect"></select>
+      <input type="datetime-local" id="zoneBInput">
+      <div class="zone-offset" id="offsetBEl"></div>
+    </div>
+
+    <div class="diff-info" id="diffEl"></div>
+  </div>
+
+  <button class="action secondary" id="nowBtn">Use current time</button>
+</main>
+
+<footer>
+  <a class="kofi" href="https://ko-fi.com/jankorwer" target="_blank" rel="noopener" title="Buy me a coffee">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="13.2" y1="2" x2="11.7" y2="6"/>
+      <rect x="5" y="6" width="14" height="3" rx="1.4"/>
+      <path d="M6 9 L7 20 Q7.2 21 8.2 21 L15.8 21 Q16.8 21 17 20 L18 9 Z"/>
+      <line x1="6.7" y1="14" x2="17.3" y2="14"/>
+    </svg>
+    Buy me a coffee
+  </a>
+</footer>
+
+<script>
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const saved = localStorage.getItem('theme') || 'dark';
+  applyTheme(saved);
+
+  themeToggle.addEventListener('click', () => {
+    const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const next = current === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+    localStorage.setItem('theme', next);
+  });
+
+  function applyTheme(theme){
+    if(theme === 'light'){
+      root.setAttribute('data-theme','light');
+      themeToggle.textContent = '☀️';
+    } else {
+      root.removeAttribute('data-theme');
+      themeToggle.textContent = '🌙';
+    }
+  }
+</script>
+
+<script>
+  // Fallback IANA zone list used only if Intl.supportedValuesOf('timeZone') is unavailable
+  // (older browsers). The IANA tz database identifiers below are public-domain data.
+  const FALLBACK_ZONES = [
+    'UTC','Africa/Abidjan','Africa/Accra','Africa/Addis_Ababa','Africa/Algiers','Africa/Cairo',
+    'Africa/Casablanca','Africa/Johannesburg','Africa/Khartoum','Africa/Lagos','Africa/Nairobi',
+    'Africa/Tripoli','Africa/Tunis','America/Anchorage','America/Argentina/Buenos_Aires',
+    'America/Bogota','America/Caracas','America/Chicago','America/Denver','America/Halifax',
+    'America/Lima','America/Los_Angeles','America/Mexico_City','America/New_York',
+    'America/Noronha','America/Phoenix','America/Santiago','America/Sao_Paulo','America/St_Johns',
+    'America/Toronto','America/Vancouver','America/Winnipeg','Antarctica/Palmer',
+    'Asia/Almaty','Asia/Amman','Asia/Baghdad','Asia/Baku','Asia/Bangkok','Asia/Beirut',
+    'Asia/Colombo','Asia/Dhaka','Asia/Dubai','Asia/Ho_Chi_Minh','Asia/Hong_Kong','Asia/Istanbul',
+    'Asia/Jakarta','Asia/Jerusalem','Asia/Kabul','Asia/Karachi','Asia/Kathmandu','Asia/Kolkata',
+    'Asia/Kuala_Lumpur','Asia/Kuwait','Asia/Manila','Asia/Riyadh','Asia/Seoul','Asia/Shanghai',
+    'Asia/Singapore','Asia/Taipei','Asia/Tehran','Asia/Tokyo','Asia/Yangon',
+    'Atlantic/Azores','Atlantic/Cape_Verde','Atlantic/Reykjavik',
+    'Australia/Adelaide','Australia/Brisbane','Australia/Darwin','Australia/Melbourne',
+    'Australia/Perth','Australia/Sydney',
+    'Europe/Amsterdam','Europe/Athens','Europe/Belgrade','Europe/Berlin','Europe/Brussels',
+    'Europe/Bucharest','Europe/Budapest','Europe/Copenhagen','Europe/Dublin','Europe/Helsinki',
+    'Europe/Istanbul','Europe/Lisbon','Europe/London','Europe/Madrid','Europe/Moscow',
+    'Europe/Oslo','Europe/Paris','Europe/Prague','Europe/Rome','Europe/Stockholm',
+    'Europe/Vienna','Europe/Warsaw','Europe/Zurich',
+    'Indian/Maldives','Indian/Mauritius',
+    'Pacific/Auckland','Pacific/Fiji','Pacific/Guam','Pacific/Honolulu','Pacific/Midway',
+    'Pacific/Noumea','Pacific/Tongatapu'
+  ];
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function getZoneList(){
+    try {
+      if (typeof Intl.supportedValuesOf === 'function') {
+        const zones = Intl.supportedValuesOf('timeZone');
+        if (zones && zones.length) return zones;
+      }
+    } catch(e){}
+    return FALLBACK_ZONES;
+  }
+
+  function buildZoneOptions(zones){
+    const groups = {};
+    zones.forEach(z => {
+      if (z === 'UTC') return;
+      const region = z.includes('/') ? z.split('/')[0] : 'Other';
+      (groups[region] = groups[region] || []).push(z);
+    });
+    const regionNames = Object.keys(groups).sort();
+    let html = `<option value="UTC">UTC</option>`;
+    regionNames.forEach(region => {
+      html += `<optgroup label="${region}">`;
+      groups[region].sort().forEach(z => {
+        const label = z.split('/').slice(1).join('/').replace(/_/g, ' ') || z;
+        html += `<option value="${z}">${label}</option>`;
+      });
+      html += `</optgroup>`;
+    });
+    return html;
+  }
+
+  function dtLocalString(y, mo, d, h, mi){
+    return `${y}-${pad(mo)}-${pad(d)}T${pad(h)}:${pad(mi)}`;
+  }
+
+  function parseDtLocal(value){
+    const [datePart, timePart] = value.split('T');
+    const [y, mo, d] = datePart.split('-').map(Number);
+    const [h, mi] = timePart.split(':').map(Number);
+    return { y, mo, d, h, mi };
+  }
+
+  function getZoneOffsetMinutes(date, timeZone){
+    const dtf = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+    const parts = dtf.formatToParts(date).reduce((acc, p) => {
+      if (p.type !== 'literal') acc[p.type] = p.value;
+      return acc;
+    }, {});
+    const asUTC = Date.UTC(+parts.year, +parts.month - 1, +parts.day, +parts.hour, +parts.minute, +parts.second);
+    return Math.round((asUTC - date.getTime()) / 60000);
+  }
+
+  function formatInZone(date, timeZone){
+    const dtf = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+    const parts = dtf.formatToParts(date).reduce((acc, p) => {
+      if (p.type !== 'literal') acc[p.type] = p.value;
+      return acc;
+    }, {});
+    return dtLocalString(+parts.year, +parts.month, +parts.day, +parts.hour, +parts.minute);
+  }
+
+  function zonedWallTimeToUtcDate(parts, timeZone){
+    const { y, mo, d, h, mi } = parts;
+    let guessMs = Date.UTC(y, mo - 1, d, h, mi);
+    for (let i = 0; i < 2; i++) {
+      const offsetMin = getZoneOffsetMinutes(new Date(guessMs), timeZone);
+      guessMs = Date.UTC(y, mo - 1, d, h, mi) - offsetMin * 60000;
+    }
+    return new Date(guessMs);
+  }
+
+  function offsetLabel(date, timeZone){
+    const offsetMin = getZoneOffsetMinutes(date, timeZone);
+    const sign = offsetMin >= 0 ? '+' : '-';
+    const abs = Math.abs(offsetMin);
+    const hh = pad(Math.floor(abs / 60));
+    const mm = pad(abs % 60);
+    let abbr = '';
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'short' }).formatToParts(date);
+      abbr = parts.find(p => p.type === 'timeZoneName')?.value || '';
+    } catch(e){}
+    return `<strong>UTC${sign}${hh}:${mm}</strong>${abbr ? ' · ' + abbr : ''}`;
+  }
+
+  const zoneASelect = document.getElementById('zoneASelect');
+  const zoneAInput = document.getElementById('zoneAInput');
+  const offsetAEl = document.getElementById('offsetAEl');
+  const zoneBSelect = document.getElementById('zoneBSelect');
+  const zoneBInput = document.getElementById('zoneBInput');
+  const offsetBEl = document.getElementById('offsetBEl');
+  const diffEl = document.getElementById('diffEl');
+  const swapBtn = document.getElementById('swapBtn');
+  const nowBtn = document.getElementById('nowBtn');
+
+  const zones = getZoneList();
+  const zoneOptionsHtml = buildZoneOptions(zones);
+  zoneASelect.innerHTML = zoneOptionsHtml;
+  zoneBSelect.innerHTML = zoneOptionsHtml;
+
+  let browserZone = 'UTC';
+  try { browserZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch(e){}
+
+  zoneASelect.value = 'UTC';
+
+  zoneBSelect.value = browserZone;
+  if (zoneBSelect.value !== browserZone) zoneBSelect.value = 'UTC';
+
+  let currentInstant = new Date();
+
+  function zoneLabel(z){
+    if (z === 'UTC') return 'UTC';
+    return z.split('/').pop().replace(/_/g, ' ');
+  }
+
+  function updateDiff(){
+    const offA = getZoneOffsetMinutes(currentInstant, zoneASelect.value);
+    const offB = getZoneOffsetMinutes(currentInstant, zoneBSelect.value);
+    const diff = offB - offA;
+    if (diff === 0) {
+      diffEl.innerHTML = 'Same offset';
+      return;
+    }
+    const sign = diff > 0 ? 'ahead of' : 'behind';
+    const abs = Math.abs(diff);
+    const hh = Math.floor(abs / 60), mm = abs % 60;
+    const parts = [];
+    if (hh) parts.push(`${hh}h`);
+    if (mm) parts.push(`${mm}m`);
+    diffEl.innerHTML = `<strong>${zoneLabel(zoneBSelect.value)}</strong> is ${parts.join(' ')} ${sign} <strong>${zoneLabel(zoneASelect.value)}</strong>`;
+  }
+
+  function syncFromInstant(){
+    zoneAInput.value = formatInZone(currentInstant, zoneASelect.value);
+    offsetAEl.innerHTML = offsetLabel(currentInstant, zoneASelect.value);
+    zoneBInput.value = formatInZone(currentInstant, zoneBSelect.value);
+    offsetBEl.innerHTML = offsetLabel(currentInstant, zoneBSelect.value);
+    updateDiff();
+  }
+
+  zoneAInput.addEventListener('change', () => {
+    if (!zoneAInput.value) return;
+    const parts = parseDtLocal(zoneAInput.value);
+    currentInstant = zonedWallTimeToUtcDate(parts, zoneASelect.value);
+    syncFromInstant();
+  });
+
+  zoneBInput.addEventListener('change', () => {
+    if (!zoneBInput.value) return;
+    const parts = parseDtLocal(zoneBInput.value);
+    currentInstant = zonedWallTimeToUtcDate(parts, zoneBSelect.value);
+    syncFromInstant();
+  });
+
+  zoneASelect.addEventListener('change', syncFromInstant);
+  zoneBSelect.addEventListener('change', syncFromInstant);
+
+  swapBtn.addEventListener('click', () => {
+    const a = zoneASelect.value;
+    zoneASelect.value = zoneBSelect.value;
+    zoneBSelect.value = a;
+    syncFromInstant();
+  });
+
+  nowBtn.addEventListener('click', () => {
+    currentInstant = new Date();
+    syncFromInstant();
+  });
+
+  syncFromInstant();
+</script>
+
+<script>
+  // Double-click anywhere to toggle fullscreen (double-click again to exit).
+  document.addEventListener('dblclick', () => {
+    if(!document.fullscreenElement && !document.webkitFullscreenElement &&
+       !document.mozFullScreenElement && !document.msFullscreenElement){
+      const elem = document.documentElement;
+      if(elem.requestFullscreen) elem.requestFullscreen();
+      else if(elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      else if(elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+      else if(elem.msRequestFullscreen) elem.msRequestFullscreen();
+    } else {
+      if(document.exitFullscreen) document.exitFullscreen();
+      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if(document.mozCancelFullScreen) document.mozCancelFullScreen();
+      else if(document.msExitFullscreen) document.msExitFullscreen();
+    }
+  });
+</script>
+
+</body>
+</html>
